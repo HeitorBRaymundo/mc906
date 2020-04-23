@@ -1,5 +1,7 @@
 import sys
 import time
+from actions import getPossibleActions
+
 
 # Print the entire maze giving a matrix
 def printMaze(maze, pacmanState):
@@ -7,20 +9,20 @@ def printMaze(maze, pacmanState):
     print(''.join(line))
   print('\n')
   print(pacmanState)
+  print(getPossibleActions(maze, pacmanState))
   print('\n')
 
 
 
-# Giving the pacman's current position and the next position, update the maze layout.
-# We update the current position to a blank space 
-# and the next position we update with the Pacman indicator
+# Giving the pacman's state and the next position, update the maze layout.
+# We update the current position of pacman to a blank space 
+# and the next position we update with the Pacman indicator ('p')
 def updatePacmanPosition(maze, pacmanState, nextPosition):
 
   currI, currJ = pacmanState['iPosition'], pacmanState['jPosition']
   maze[currI][currJ] = ' '
 
   [nextI, nextJ] = nextPosition
-
   if (maze[nextI][nextJ] == '.'):
     pacmanState['currPoints'] += 1;
 
@@ -33,8 +35,10 @@ def updatePacmanPosition(maze, pacmanState, nextPosition):
 
 
 # Main function to be executed, take the input from stdin and build the maze matrix
-def buildMaze():
+def buildMaze(pacmanState):
   maze = []
+
+  initialI, initialJ = pacmanState['iPosition'], pacmanState['jPosition']
 
   maze_line = []
   for line in sys.stdin:
@@ -44,6 +48,6 @@ def buildMaze():
     maze.append(maze_line)
     maze_line = []
 
-  maze[1][0] = 'p'
+  maze[initialI][initialJ] = 'p'
 
   return maze

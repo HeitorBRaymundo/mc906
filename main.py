@@ -1,20 +1,18 @@
 from maze import *
 from pacman import *
 
-maze = buildMaze()
+maze = buildMaze(pacmanState)
 
 printMaze(maze, pacmanState)
-updatePacmanPosition(maze, pacmanState, [1,1])
-printMaze(maze, pacmanState)
-updatePacmanPosition(maze, pacmanState, [1,2])
-printMaze(maze, pacmanState)
-updatePacmanPosition(maze, pacmanState, [1,3])
-printMaze(maze, pacmanState)
-updatePacmanPosition(maze, pacmanState, [1,4])
-printMaze(maze, pacmanState)
-updatePacmanPosition(maze, pacmanState, [2,4])
-printMaze(maze, pacmanState)
-updatePacmanPosition(maze, pacmanState, [1,4])
-printMaze(maze, pacmanState)
-updatePacmanPosition(maze, pacmanState, [1,3])
-printMaze(maze, pacmanState)
+possibleActions = getPossibleActions(maze, pacmanState)
+
+nextPosition = possibleActions[0]
+
+while(nextPosition):
+  updatePacmanPosition(maze, pacmanState, nextPosition['pos'])
+  printMaze(maze, pacmanState)
+
+  possibleActions = getPossibleActions(maze, pacmanState)
+  nextPosition = possibleActions[0]
+
+print('deadend')
