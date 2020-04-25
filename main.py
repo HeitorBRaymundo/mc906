@@ -9,7 +9,7 @@ possibleActions = getPossibleActions(maze, pacmanState)
 nextPosition = possibleActions[0]
 
 while(nextPosition):
-  updatePacmanPosition(maze, pacmanState, nextPosition['pos'])
+  updatePacmanPosition(maze, pacmanState, nextPosition)
   printMaze(maze, pacmanState)
 
   possibleActions = getPossibleActions(maze, pacmanState)

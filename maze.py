@@ -22,7 +22,7 @@ def updatePacmanPosition(maze, pacmanState, nextPosition):
   currI, currJ = pacmanState['iPosition'], pacmanState['jPosition']
   maze[currI][currJ] = ' '
 
-  [nextI, nextJ] = nextPosition
+  [nextI, nextJ] = nextPosition['pos']
   if (maze[nextI][nextJ] == '.'):
     pacmanState['currPoints'] += 1;
 
@@ -30,6 +30,7 @@ def updatePacmanPosition(maze, pacmanState, nextPosition):
   pacmanState['jPosition'] = nextJ
   maze[nextI][nextJ] = 'p'
   pacmanState['currSteps'] += 1;
+  pacmanState['lastAction'] = nextPosition['action']
 
   time.sleep(1)
 

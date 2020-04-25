@@ -3,6 +3,7 @@
 def getPossibleActions(maze, pacmanState):
 
   currI, currJ = pacmanState['iPosition'], pacmanState['jPosition']
+  lastAction = pacmanState['lastAction']
 
   possibleActions = []
 
@@ -10,7 +11,7 @@ def getPossibleActions(maze, pacmanState):
   rightI, rightJ = currI, currJ + 1
   if (checkBound(rightI, rightJ)):
     rightPosition = maze[rightI][rightJ]
-    if (checkObstacle(rightPosition)):
+    if (checkObstacle(rightPosition) and not isBackwardAction('RIGHT', lastAction)):
       action = {
         'action': 'RIGHT',
         'pos': [rightI, rightJ]
@@ -22,7 +23,7 @@ def getPossibleActions(maze, pacmanState):
   downI, downJ = currI + 1, currJ 
   if (checkBound(downI, downJ)):
     downPosition = maze[downI][downJ]
-    if (checkObstacle(downPosition)):
+    if (checkObstacle(downPosition) and not isBackwardAction('DOWN', lastAction)):
       action = {
         'action': 'DOWN',
         'pos': [downI, downJ]
@@ -33,7 +34,7 @@ def getPossibleActions(maze, pacmanState):
   leftI, leftJ = currI, currJ - 1
   if (checkBound(leftI, leftJ)):
     leftPosition = maze[leftI][leftJ]
-    if (checkObstacle(leftPosition)):
+    if (checkObstacle(leftPosition) and not isBackwardAction('LEFT', lastAction)):
       action = {
         'action': 'LEFT',
         'pos': [leftI, leftJ]
@@ -44,7 +45,7 @@ def getPossibleActions(maze, pacmanState):
   upI, upJ = currI - 1, currJ
   if (checkBound(upI, upJ)):
     upPosition = maze[upI][upJ]
-    if (checkObstacle(upPosition)):
+    if (checkObstacle(upPosition) and not isBackwardAction('UP', lastAction)):
       action = {
         'action': 'UP',
         'pos': [upI, upJ]
@@ -63,3 +64,18 @@ def checkObstacle(position):
   if (position == '|'):
     return False
   return True
+
+def isBackwardAction(currentAction, lastAction):
+  if(currentAction == 'RIGHT'):
+    if(lastAction == 'LEFT'):
+      return True
+  elif(currentAction == 'LEFT'):
+    if(lastAction == 'RIGHT'):
+      return True
+  elif(currentAction == 'UP'):
+    if(lastAction == 'DOWN'):
+      return True 
+  elif(currentAction == 'DOWN'):
+    if(lastAction == 'UP'):
+      return True 
+  return False
