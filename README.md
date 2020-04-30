@@ -1,3 +1,12 @@
-# mc906
+# Projeto 1 - Pacman Maze Solver
 
-Execute `python3 main.py < maze.txt` to run.
+### Requirements
+
+- Python 3
+- Jupyter Notebook (para execução das céluas)
+- AIMA library:
+
+    cd aima-python
+    
+    pip install -r requirements.txt
+    
