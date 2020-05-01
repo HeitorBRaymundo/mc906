@@ -237,7 +237,6 @@ def hill_climbing(problem):
     statistics = Statistics()
     current = Node(problem.initial)
     while True:
-        #statistics.update_memory(len(frontier))
         statistics.update_iterations(1)
         neighbors = current.expand(problem)
         if not neighbors:
@@ -247,12 +246,21 @@ def hill_climbing(problem):
             break
         current = neighbor
         statistics.update_expanded(1)
-        print(current)
-    statistics.finish(1)   
-    return statistics, current
+    statistics.finish(1)
+    if problem.goal_test(current.state):
+        return statistics, current
+    return statistics, None
 
 maze = Maze("mazes/maze_himclimbing.txt")
 problem = MazePacmanProblem(maze)
 print(maze)
 statistics, node = hill_climbing(problem)
 print(statistics)
+print(node)
+
+maze = Maze("mazes/maze_himclimbing_2.txt")
+problem = MazePacmanProblem(maze)
+print(maze)
+statistics, node = hill_climbing(problem)
+print(statistics)
+print(node)
