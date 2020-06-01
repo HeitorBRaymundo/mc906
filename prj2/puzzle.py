@@ -53,6 +53,15 @@ class Puzzle(PiecesManager):
         np.random.shuffle(shuffle)
         return shuffle.reshape(self.pieces.shape)
 
+    def get_avg_rand_iterations(self):
+        value = self.pieces.shape[0] * self.pieces.shape[1]
+        factorial = 1
+        while value > 1:
+            factorial = factorial * value
+            value = value - 1
+        return factorial
+
+
 
 
 

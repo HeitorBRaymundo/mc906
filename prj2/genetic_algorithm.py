@@ -12,7 +12,7 @@ def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10,
 
     # plota melhor individuo
     plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
-    while ga.iterations < max_iterations or ga.stop_criteria():
+    while ga.iterations < max_iterations and not ga.stop_criteria():
         #ga.iterate()
         plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
 
@@ -159,7 +159,7 @@ class ProposedSolution(PiecesManager):
         result = 0
         for i in range(self.pieces.shape[0]):
             for j in range(self.pieces.shape[1]):
-                result = result + 1 - self.pieces[i][j].eval_absolute(i, j)
+                result = result + 1 - self.pieces[i][j].eval_absolute(j, i)
 
         self.fitness = result
         return result

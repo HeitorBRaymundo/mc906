@@ -5,14 +5,14 @@ class Piece:
     def __init__(self, image, posX, posY):
         self.image = image
         self.image_pad = np.pad(self.image, ((1, 1), (1, 1), (0, 0)), 'constant', constant_values=0)
-        self.pos = (posY, posX)
+        self.pos = (posX, posY)
         self.neighbors = (None, None, None, None)
 
     def set_neighbors(self, up, right, down, left):
         self.neighbors = (up, right, down, left)
 
     def eval_absolute(self, posX, posY):
-        return int((posY, posX) == self.pos)
+        return int((posX, posY) == self.pos)
 
     def eval_relative(self, up, right, down, left):
         return int(up == self.neighbors[0]) + int(right == self.neighbors[1]) + \
@@ -43,7 +43,7 @@ class PiecesManager:
         return result_image
 
     def get_piece(self, i, j):
-        if i < self.pieces.shape[0] and j < self.pieces.shape[1]:
+        if i in range(0, self.pieces.shape[0]) and j in range(0, self.pieces.shape[1]):
             return self.pieces[i][j]
         return None
 
