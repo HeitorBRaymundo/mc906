@@ -1,4 +1,6 @@
 from piece import PiecesManager
+from puzzle import Puzzle
+from selection import *
 import numpy as np
 
 from utils import plot_image
@@ -31,6 +33,7 @@ class GeneticAlgorithm:
         self.crossover = crossover
         self.size = size
         self.statistics = []
+        self.selection_count = round(size/2)
 
 
         # inicializa populacao de forma randomica
@@ -66,10 +69,10 @@ class GeneticAlgorithm:
         return getattr(self, '_{}'.format(self.selection))()
 
     def _selection1(self):
-        raise NotImplementedError()
+        return selected_pop = roulette_selection(self.population, self.selection_count)
 
     def _selection2(self):
-        raise NotImplementedError()
+        return selected_pop = tournament_selection(self.population, self.selection_count)
 
     def _replace(self):
         '''
