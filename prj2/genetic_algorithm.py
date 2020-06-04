@@ -1,13 +1,12 @@
 from piece import PiecesManager
-from puzzle import Puzzle
-from selection import *
 import numpy as np
 
+from selection import roulette_selection, tournament_selection
 from utils import plot_image
 
 
 def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
-                          selection='selection1', mutation='mutation1', replace='replace1', crossover='crossover1'):
+                          selection='roulette', mutation='mutation1', replace='replace1', crossover='crossover1'):
 
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, mutation_rate=mutation_rate, fitness=fitness,
                           selection=selection, crossover=crossover, mutation=mutation, replace=replace)
@@ -66,13 +65,13 @@ class GeneticAlgorithm:
         '''
         retorna lista dos pais para reproducao
         '''
-        return getattr(self, '_{}'.format(self.selection))()
+        return getattr(self, '_selection_{}'.format(self.selection))()
 
-    def _selection1(self):
-        return selected_pop = roulette_selection(self.population, self.selection_count)
+    def _selection_roulette(self):
+        return roulette_selection(self.population, self.selection_count)
 
-    def _selection2(self):
-        return selected_pop = tournament_selection(self.population, self.selection_count)
+    def _selection_tournament(self):
+        return tournament_selection(self.population, self.selection_count)
 
     def _replace(self):
         '''
