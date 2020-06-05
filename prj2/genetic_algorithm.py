@@ -1,18 +1,19 @@
 from piece import PiecesManager
 import numpy as np
 
+from selection import roulette_selection, tournament_selection
+from replacement import elitism, steady_state
 from utils import plot_image
 
-
 def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
-                          selection='selection1', mutation='mutation1', replace='replace1', crossover='crossover1'):
+                          selection='roulette', mutation='mutation1', replace='replace_elitism', crossover='crossover1'):
 
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, mutation_rate=mutation_rate, fitness=fitness,
                           selection=selection, crossover=crossover, mutation=mutation, replace=replace)
 
     # plota melhor individuo
     plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
-    while ga.iterations < max_iterations or ga.stop_criteria():
+    while ga.iterations < max_iterations and not ga.stop_criteria():
         #ga.iterate()
         plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
 
@@ -31,6 +32,8 @@ class GeneticAlgorithm:
         self.crossover = crossover
         self.size = size
         self.statistics = []
+        self.selection_count = round(size/2)
+        self.replacement_rate = 0.1
 
 
         # inicializa populacao de forma randomica
@@ -63,13 +66,13 @@ class GeneticAlgorithm:
         '''
         retorna lista dos pais para reproducao
         '''
-        return getattr(self, '_{}'.format(self.selection))()
+        return getattr(self, '_selection_{}'.format(self.selection))()
 
-    def _selection1(self):
-        raise NotImplementedError()
+    def _selection_roulette(self):
+        return roulette_selection(self.population, self.selection_count)
 
-    def _selection2(self):
-        raise NotImplementedError()
+    def _selection_tournament(self):
+        return tournament_selection(self.population, self.selection_count)
 
     def _replace(self):
         '''
@@ -77,11 +80,13 @@ class GeneticAlgorithm:
         '''
         return getattr(self, '_{}'.format(self.replace))()
 
-    def _replace1(self, new_population):
-        raise NotImplementedError()
+    def _replace_elitism(self, new_population):
+        self._eval_fitness(new_population) # TODO verificar se será necessario computar o fitness nesse momento ou se já foi computado
+        return elitism(self.get_best(), new_population)
 
-    def _replace2(self, new_population):
-        raise NotImplementedError()
+    def _replace_steady_state(self, new_population):
+        self._eval_fitness(new_population) # TODO verificar se será necessario computar o fitness nesse momento ou se já foi computado
+        return steady_state(self.population, new_population, steady_rate=self.replacement_rate)
 
     def _mutation(self, population):
         '''
@@ -162,7 +167,7 @@ class ProposedSolution(PiecesManager):
         result = 0
         for i in range(self.pieces.shape[0]):
             for j in range(self.pieces.shape[1]):
-                result = result + 1 - self.pieces[i][j].eval_absolute(i, j)
+                result = result + 1 - self.pieces[i][j].eval_absolute(j, i)
 
         self.fitness = result
         return result
