@@ -88,8 +88,8 @@ class GeneticAlgorithm:
         faz mutacao considerando self.mutation_rate
         '''
         # chamar metodo de mutação selecionado por self.mutation:
-        # getattr(self,'_{}'.format(self.mutation))(population)
-        raise NotImplementedError()
+        return getattr(self,'_{}'.format(self.mutation))(population)
+        #raise NotImplementedError()
 
     def _crossover(self, parent1, parent2):
         '''
@@ -136,12 +136,15 @@ class GeneticAlgorithm:
 class ProposedSolution(PiecesManager):
     # chromosome
 
-    def __init__(self, pieces):
+    def __init__(self, pieces):x
         super().__init__(pieces)
         self.fitness = np.inf
 
     def mutation1(self):
-        raise NotImplementedError()
+        oldPiece = self.pieces[2][3]
+        newPiece = self.pieces[0][0]
+        self.pieces[2][3] = newPiece
+        self.pieces[0][0] = oldPiece
 
     def mutation2(self):
         raise NotImplementedError()
