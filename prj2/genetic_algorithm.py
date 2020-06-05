@@ -2,11 +2,11 @@ from piece import PiecesManager
 import numpy as np
 
 from selection import roulette_selection, tournament_selection
+from replacement import elitism, steady_state
 from utils import plot_image
 
-
 def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
-                          selection='roulette', mutation='mutation1', replace='replace1', crossover='crossover1'):
+                          selection='roulette', mutation='mutation1', replace='replace_elitism', crossover='crossover1'):
 
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, mutation_rate=mutation_rate, fitness=fitness,
                           selection=selection, crossover=crossover, mutation=mutation, replace=replace)
@@ -79,11 +79,13 @@ class GeneticAlgorithm:
         '''
         return getattr(self, '_{}'.format(self.replace))()
 
-    def _replace1(self, new_population):
-        raise NotImplementedError()
+    def _replace_elitism(self, new_population):
+        self._eval_fitness(new_population) # TODO verificar se será necessario computar o fitness nesse momento ou se já foi computado
+        return elitism(self.get_best(), new_population)
 
-    def _replace2(self, new_population):
-        raise NotImplementedError()
+    def _replace_steady_state(self, new_population):
+        self._eval_fitness(new_population) # TODO verificar se será necessario computar o fitness nesse momento ou se já foi computado
+        return steady_state(self.population, new_population)
 
     def _mutation(self, population):
         '''
