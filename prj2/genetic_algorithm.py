@@ -33,6 +33,7 @@ class GeneticAlgorithm:
         self.size = size
         self.statistics = []
         self.selection_count = round(size/2)
+        self.replacement_rate = 0.1
 
 
         # inicializa populacao de forma randomica
@@ -85,7 +86,7 @@ class GeneticAlgorithm:
 
     def _replace_steady_state(self, new_population):
         self._eval_fitness(new_population) # TODO verificar se será necessario computar o fitness nesse momento ou se já foi computado
-        return steady_state(self.population, new_population)
+        return steady_state(self.population, new_population, steady_rate=self.replacement_rate)
 
     def _mutation(self, population):
         '''
