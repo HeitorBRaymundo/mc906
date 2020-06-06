@@ -5,7 +5,7 @@ from mutation import mutation_A
 from utils import plot_image
 
 puzzle = Puzzle('imgs/triforce.png', 3, 4)
-exp_genetic_algorithm(puzzle, 1, max_iterations=0)
+exp_genetic_algorithm(puzzle, 10, max_iterations=4)
 
 newPuzzle = mutation_A(puzzle)
 exp_genetic_algorithm(newPuzzle, 1, max_iterations=0)

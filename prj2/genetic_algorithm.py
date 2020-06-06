@@ -7,6 +7,7 @@ from copy import deepcopy
 from selection import roulette_selection, tournament_selection
 from replacement import elitism, steady_state
 from utils import plot_image
+from custom_statistics import Statistics
 
 def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
                           selection='roulette', mutation='mutation1', replace='replace_elitism', crossover='crossover1'):
@@ -17,9 +18,10 @@ def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10,
     # plota melhor individuo
     plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
     while ga.iterations < max_iterations and not ga.stop_criteria():
-        #ga.iterate()
+        ga.iterate()
         plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
 
+    ga.statistics.print()
     print(ga)
 
 
@@ -34,7 +36,7 @@ class GeneticAlgorithm:
         self.mutation = mutation
         self.crossover = crossover
         self.size = size
-        self.statistics = []
+        self.statistics = Statistics()
         self.selection_count = round(size/2)
         self.replacement_rate = 0.1
 
@@ -77,18 +79,16 @@ class GeneticAlgorithm:
     def _selection_tournament(self):
         return tournament_selection(self.population, self.selection_count)
 
-    def _replace(self):
+    def _replace(self, next_gen):
         '''
         retorna proxima geracao
         '''
-        return getattr(self, '_{}'.format(self.replace))()
+        return getattr(self, '_{}'.format(self.replace))(next_gen)
 
     def _replace_elitism(self, new_population):
-        self._eval_fitness(new_population) # TODO verificar se será necessario computar o fitness nesse momento ou se já foi computado
         return elitism(self.get_best(), new_population)
 
     def _replace_steady_state(self, new_population):
-        self._eval_fitness(new_population) # TODO verificar se será necessario computar o fitness nesse momento ou se já foi computado
         return steady_state(self.population, new_population, steady_rate=self.replacement_rate)
 
     def _mutation(self, population):
@@ -110,12 +110,14 @@ class GeneticAlgorithm:
         '''
         salva min, max e media... em self.statistics para plotar acompanhamento
         '''
-        raise NotImplementedError()
+        self.statistics.update(self.population)
 
     def iterate(self):
 
         # seleciona candidatos a pais (ordenados)
         selected_parents = self._selection()
+
+        print('passou aqui')
 
         # crossover entre dois individuos
         next_gen = []
@@ -124,16 +126,16 @@ class GeneticAlgorithm:
             parent2 = selected_parents[i]
             child1, child2 = self._crossover(parent1, parent2)
             next_gen.extend([child1, child2])
-
+            
         # avalia fitness e ordena next_gen
         self._eval_fitness(next_gen)
         next_gen.sort()
 
         # substitui pela proxima geracao
-        self.population = self._replace()
+        self.population = self._replace(next_gen)
 
         self._update_statistics()
-        self.iterations = self.iterations + self.iterations
+        self.iterations += 1
 
     def __str__(self):
         string = ""
