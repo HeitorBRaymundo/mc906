@@ -1,5 +1,8 @@
 from piece import PiecesManager
 import numpy as np
+import random
+import math
+from copy import deepcopy
 
 from selection import roulette_selection, tournament_selection
 from replacement import elitism, steady_state
@@ -93,8 +96,9 @@ class GeneticAlgorithm:
         faz mutacao considerando self.mutation_rate
         '''
         # chamar metodo de mutação selecionado por self.mutation:
-        return getattr(self,'_{}'.format(self.mutation))(population)
-        #raise NotImplementedError()
+        checkRate = random.randint(0, 100)
+        if (checkRate <= self.mutation_rate):
+            return getattr(self,'_{}'.format(self.mutation))(population)
 
     def _crossover(self, parent1, parent2):
         '''
@@ -141,18 +145,48 @@ class GeneticAlgorithm:
 class ProposedSolution(PiecesManager):
     # chromosome
 
-    def __init__(self, pieces):x
+    def __init__(self, pieces):
         super().__init__(pieces)
         self.fitness = np.inf
 
     def mutation1(self):
-        oldPiece = self.pieces[2][3]
-        newPiece = self.pieces[0][0]
-        self.pieces[2][3] = newPiece
-        self.pieces[0][0] = oldPiece
+        # Swap sequence: swapping lines
+        swapFromRow = random.randint(0, len(self.pieces) - 1)
+        swapToRow = random.randint(0, len(self.pieces) - 1)
+
+        while (swapFromRow == swapToRow):
+            swapToRow = random.randint(0, len(self.pieces) - 1)
+
+        fromRow = deepcopy(self.pieces[swapFromRow])
+        toRow = deepcopy(self.pieces[swapToRow])
+        self.pieces[swapToRow] = fromRow
+        self.pieces[swapFromRow] = toRow
 
     def mutation2(self):
-        raise NotImplementedError()
+        # Swap: swapping n cells, where n is a number calculated giving the size of the puzzle and a random rate
+        rows = len(self.pieces)
+        cols = len(self.pieces[0])
+
+        swapRate = random.randint(10, 30)/100
+        base = rows * cols
+        numberOfSwaps = int(base * swapRate)
+
+        for i in range(0, numberOfSwaps):
+            randFromRow = random.randint(0, rows - 1)
+            randFromCol = random.randint(0, cols - 1)
+
+            randToRow = random.randint(0, rows - 1)
+            randToCol = random.randint(0, cols - 1)
+
+            while (randFromCol == randToCol and randFromRow == randToRow):
+                randToRow = random.randint(0, rows - 1)
+                randToCol = random.randint(0, cols - 1)
+        
+            fromCel = self.pieces[randFromRow][randFromCol]
+            toCel = self.pieces[randToRow][randToCol]
+
+            self.pieces[randToRow][randToCol] = fromCel
+            self.pieces[randFromRow][randFromCol] = toCel
 
     def crossover1(self, other_proposed_solution):
         raise NotImplementedError()
