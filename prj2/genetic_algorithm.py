@@ -213,9 +213,9 @@ class ProposedSolution(PiecesManager):
         sameRow = parent1BestRow == parent2BestRow
         if (sameRow):
             # Quando a melhor linha dos dois pais forem a mesma, vamos escolher a melhor entre elas
-            selectedRow = deepcopy(self.pieces[parent1BestRow]) \
+            selectedRow = self.pieces[parent1BestRow] \
                 if parent1BestRowValue < parent2BestRowValue \
-                else deepcopy(other_proposed_solution.pieces[parent2BestRow])
+                else other_proposed_solution.pieces[parent2BestRow]
 
             # O filho terá a maior parte do cromossomo sendo do melhor pai
             child = bestParent
