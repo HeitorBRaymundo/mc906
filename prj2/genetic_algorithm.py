@@ -205,15 +205,9 @@ class ProposedSolution(PiecesManager):
         [parent1BestRow, parent1BestRowValue] = getBestRow(self.pieces)
         [parent2BestRow, parent2BestRowValue] = getBestRow(other_proposed_solution.pieces)
 
-        # print('Parent 1 best row:', parent1BestRow, 'Parent 2 best row:', parent2BestRow)
-
         parent1Fitness = self.fitness_relative()
         parent2Fitness = other_proposed_solution.fitness_relative()
         bestParent = self if parent1Fitness < parent2Fitness else other_proposed_solution
-
-
-        # print('Fitness pai 1: ', parent1Fitness)
-        # print('Fitness pai 2: ', parent2Fitness)
 
         sameRow = parent1BestRow == parent2BestRow
         if (sameRow):
@@ -225,7 +219,7 @@ class ProposedSolution(PiecesManager):
             # O filho terá a maior parte do cromossomo sendo do melhor pai
             child = deepcopy(bestParent)
             
-            child = handleWithRepeatedCells(child, bestParent, parent1BestRow, selectedRow)
+            #child = handleWithRepeatedCells(child, bestParent, parent1BestRow, selectedRow)
 
             return child
         else:
@@ -234,10 +228,10 @@ class ProposedSolution(PiecesManager):
 
             # Adicionamos em 2 linhas do filho, as melhores linhas de cada um dos pais
             child.pieces[parent1BestRow] = deepcopy(self.pieces[parent1BestRow])
-            child = handleWithRepeatedCells(child, bestParent, parent1BestRow, self.pieces[parent1BestRow])
+            #child = handleWithRepeatedCells(child, bestParent, parent1BestRow, self.pieces[parent1BestRow])
 
             child.pieces[parent2BestRow] = deepcopy(other_proposed_solution.pieces[parent2BestRow])
-            child = handleWithRepeatedCells(child, bestParent, parent2BestRow, other_proposed_solution.pieces[parent2BestRow])
+            # child = handleWithRepeatedCells(child, bestParent, parent2BestRow, other_proposed_solution.pieces[parent2BestRow])
             
             return child
        
@@ -314,40 +308,3 @@ def getBestRow (pieces):
             bestRowValue = rowValuation
 
     return (bestRow, bestRowValue)
-
-
-def handleWithRepeatedCells (child, parent, changedRow, selectedRow):
-    repeatedCells = []
-    for cell in selectedRow:
-        for row in range(0, len(parent.pieces)):
-            if (row == changedRow):
-                continue;
-            for col in range(0, len(parent.pieces[row])):
-                if (parent.pieces[row][col].pos == cell.pos):
-                    dict = {}
-                    dict['cell'] = cell
-                    dict['position'] = (row, col)
-                    repeatedCells.append(dict)
-
-    parent.pieces[changedRow]
-    piecesToReplace = []
-    for cell in parent.pieces[changedRow]:
-
-        includeOnReplacement = True
-
-        for replacementCell in selectedRow:
-            if (replacementCell.pos == cell.pos):
-                includeOnReplacement = False
-                break
-        
-        if (includeOnReplacement):
-            piecesToReplace.append(cell)
-
-    # Adicionamos ao filho a melhor linha entre os dois pais
-    child.pieces[changedRow] = selectedRow
-
-    for repeatedCell in range(0, len(repeatedCells)):
-        [row, col] = repeatedCells[repeatedCell]['position']
-        child.pieces[row][col] = deepcopy(piecesToReplace[repeatedCell])
-
-    return deepcopy(child)
