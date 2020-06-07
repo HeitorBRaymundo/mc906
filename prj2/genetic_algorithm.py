@@ -96,9 +96,11 @@ class GeneticAlgorithm:
         faz mutacao considerando self.mutation_rate
         '''
         # chamar metodo de mutação selecionado por self.mutation:
-        checkRate = random.randint(0, 100)
-        if (checkRate <= self.mutation_rate):
-            return getattr(self,'_{}'.format(self.mutation))(population)
+        for indv in population:
+            checkRate = random.randint(0, 100)
+            if (checkRate <= self.mutation_rate):
+                getattr(indv,'{}'.format(self.mutation))()
+        return population
 
     def _crossover(self, parent1, parent2):
         '''
@@ -224,63 +226,6 @@ class ProposedSolution(PiecesManager):
             child = deepcopy(bestParent)
             
             child = handleWithRepeatedCells(child, bestParent, parent1BestRow, selectedRow)
-            # repeatedCells = []
-            # for cell in selectedRow:
-            #     for row in range(0, len(bestParent.pieces)):
-            #         if (row == parent1BestRow):
-            #             continue;
-            #         for col in range(0, len(bestParent.pieces[row])):
-            #             if (bestParent.pieces[row][col].pos == cell.pos):
-            #                 dict = {}
-            #                 dict['cell'] = cell
-            #                 dict['position'] = (row, col)
-            #                 repeatedCells.append(dict)
-
-            #         # repeatedCellsInRow = list(filter(lambda checkCell: checkCell.pos == cell.pos, bestParent.pieces[row]))
-            #         # repeatedCells.extend(repeatedCellsInRow)
-
-            # # print('Melhor linha: ', list(map(lambda x: x.pos, selectedRow)))
-            # # print('Linha a ser substituída do melhor pai: ', list(map(lambda x: x.pos, bestParent.pieces[parent1BestRow])))
-            # # print(list(map(lambda x: x['position'], repeatedCells)))
-            # # print('Peças repetidas: ', list(map(lambda x: x['cell'].pos, repeatedCells)))
-
-            # bestParent.pieces[parent1BestRow]
-            # piecesToReplace = []
-            # for cell in bestParent.pieces[parent1BestRow]:
-
-            #     includeOnReplacement = True
-
-            #     for replacementCell in selectedRow:
-            #         if (replacementCell.pos == cell.pos):
-            #             includeOnReplacement = False
-            #             break
-                
-            #     if (includeOnReplacement):
-            #         piecesToReplace.append(cell)
-
-            # # print('Peças a serem recolocadas: ', list(map(lambda x: x.pos, piecesToReplace)))
-
-            # # Adicionamos ao filho a melhor linha entre os dois pais
-            # child.pieces[parent1BestRow] = selectedRow
-
-            # for repeatedCell in range(0, len(repeatedCells)):
-            #     [row, col] = repeatedCells[repeatedCell]['position']
-            #     child.pieces[row][col] = deepcopy(piecesToReplace[repeatedCell])
-
-            # print('Fitness filho: ', child.fitness_relative())
-
-            # print('Pai 1')
-            # for row in self.pieces:
-            #     print(list(map(lambda x: x.pos, row)))
-
-            # print('Pai 2')
-            # for row in other_proposed_solution.pieces:
-            #     print(list(map(lambda x: x.pos, row)))
-
-            # print('Filho')
-            # for row in child.pieces:
-            #     print(list(map(lambda x: x.pos, row)))
-
 
             return child
         else:
@@ -294,7 +239,6 @@ class ProposedSolution(PiecesManager):
             child.pieces[parent2BestRow] = deepcopy(other_proposed_solution.pieces[parent2BestRow])
             child = handleWithRepeatedCells(child, bestParent, parent2BestRow, other_proposed_solution.pieces[parent2BestRow])
             
-            # print('Fitness filho: ', child.fitness_relative())
             return child
        
 
