@@ -126,7 +126,7 @@ class GeneticAlgorithm:
             parent2 = selected_parents[i]
             child1, child2 = self._crossover(parent1, parent2)
             next_gen.extend([child1, child2])
-            
+
         # avalia fitness e ordena next_gen
         self._eval_fitness(next_gen)
         next_gen.sort()
@@ -150,6 +150,7 @@ class ProposedSolution(PiecesManager):
     def __init__(self, pieces):
         super().__init__(pieces)
         self.fitness = np.inf
+        self.pieces_set = set(self.pieces.flatten())
 
     def mutation1(self):
         # Swap sequence: swapping lines
@@ -183,7 +184,7 @@ class ProposedSolution(PiecesManager):
             while (randFromCol == randToCol and randFromRow == randToRow):
                 randToRow = random.randint(0, rows - 1)
                 randToCol = random.randint(0, cols - 1)
-        
+
             fromCel = self.pieces[randFromRow][randFromCol]
             toCel = self.pieces[randToRow][randToCol]
 
@@ -195,6 +196,21 @@ class ProposedSolution(PiecesManager):
 
     def crossover2(self, other_proposed_solution):
         raise NotImplementedError()
+
+    def correct_solution(self):
+        remaining_set = self.pieces_set - set(self.pieces.flatten())
+        track_set = set()
+
+        new_pieces = []
+        for piece in self.pieces.flatten():
+            if piece not in track_set:
+                new_pieces.append(piece)
+            else:
+                new_pieces.append(remaining_set.pop())
+            track_set.add(piece)
+
+        self.pieces = np.array(new_pieces).reshape(self.pieces.shape)
+
 
     def fitness_absolute(self):
         """
