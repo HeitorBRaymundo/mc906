@@ -7,6 +7,7 @@ from copy import deepcopy
 from selection import roulette_selection, tournament_selection
 from replacement import elitism, steady_state
 from utils import plot_image
+from custom_statistics import Statistics
 
 def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
                           selection='roulette', mutation='mutation1', replace='replace_elitism', crossover='crossover1'):
@@ -17,9 +18,10 @@ def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10,
     # plota melhor individuo
     plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
     while ga.iterations < max_iterations and not ga.stop_criteria():
-        #ga.iterate()
+        ga.iterate()
         plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
 
+    ga.statistics.print()
     print(ga)
 
 
@@ -34,7 +36,7 @@ class GeneticAlgorithm:
         self.mutation = mutation
         self.crossover = crossover
         self.size = size
-        self.statistics = []
+        self.statistics = Statistics()
         self.selection_count = round(size/2)
         self.replacement_rate = 0.1
 
@@ -77,18 +79,16 @@ class GeneticAlgorithm:
     def _selection_tournament(self):
         return tournament_selection(self.population, self.selection_count)
 
-    def _replace(self):
+    def _replace(self, next_gen):
         '''
         retorna proxima geracao
         '''
-        return getattr(self, '_{}'.format(self.replace))()
+        return getattr(self, '_{}'.format(self.replace))(next_gen)
 
     def _replace_elitism(self, new_population):
-        self._eval_fitness(new_population) # TODO verificar se será necessario computar o fitness nesse momento ou se já foi computado
         return elitism(self.get_best(), new_population)
 
     def _replace_steady_state(self, new_population):
-        self._eval_fitness(new_population) # TODO verificar se será necessario computar o fitness nesse momento ou se já foi computado
         return steady_state(self.population, new_population, steady_rate=self.replacement_rate)
 
     def _mutation(self, population):
@@ -110,12 +110,14 @@ class GeneticAlgorithm:
         '''
         salva min, max e media... em self.statistics para plotar acompanhamento
         '''
-        raise NotImplementedError()
+        self.statistics.update(self.population)
 
     def iterate(self):
 
         # seleciona candidatos a pais (ordenados)
         selected_parents = self._selection()
+
+        print('passou aqui')
 
         # crossover entre dois individuos
         next_gen = []
@@ -130,10 +132,10 @@ class GeneticAlgorithm:
         next_gen.sort()
 
         # substitui pela proxima geracao
-        self.population = self._replace()
+        self.population = self._replace(next_gen)
 
         self._update_statistics()
-        self.iterations = self.iterations + self.iterations
+        self.iterations += 1
 
     def __str__(self):
         string = ""
@@ -148,6 +150,7 @@ class ProposedSolution(PiecesManager):
     def __init__(self, pieces):
         super().__init__(pieces)
         self.fitness = np.inf
+        self.pieces_set = set(self.pieces.flatten())
 
     def mutation1(self):
         # Swap sequence: swapping lines
@@ -181,7 +184,7 @@ class ProposedSolution(PiecesManager):
             while (randFromCol == randToCol and randFromRow == randToRow):
                 randToRow = random.randint(0, rows - 1)
                 randToCol = random.randint(0, cols - 1)
-        
+
             fromCel = self.pieces[randFromRow][randFromCol]
             toCel = self.pieces[randToRow][randToCol]
 
@@ -215,63 +218,64 @@ class ProposedSolution(PiecesManager):
 
             # O filho terá a maior parte do cromossomo sendo do melhor pai
             child = deepcopy(bestParent)
+            
+            child = handleWithRepeatedCells(child, bestParent, parent1BestRow, selectedRow)
+            # repeatedCells = []
+            # for cell in selectedRow:
+            #     for row in range(0, len(bestParent.pieces)):
+            #         if (row == parent1BestRow):
+            #             continue;
+            #         for col in range(0, len(bestParent.pieces[row])):
+            #             if (bestParent.pieces[row][col].pos == cell.pos):
+            #                 dict = {}
+            #                 dict['cell'] = cell
+            #                 dict['position'] = (row, col)
+            #                 repeatedCells.append(dict)
 
-            repeatedCells = []
-            for cell in selectedRow:
-                for row in range(0, len(bestParent.pieces)):
-                    if (row == parent1BestRow):
-                        continue;
-                    for col in range(0, len(bestParent.pieces[row])):
-                        if (bestParent.pieces[row][col].pos == cell.pos):
-                            dict = {}
-                            dict['cell'] = cell
-                            dict['position'] = (row, col)
-                            repeatedCells.append(dict)
+            #         # repeatedCellsInRow = list(filter(lambda checkCell: checkCell.pos == cell.pos, bestParent.pieces[row]))
+            #         # repeatedCells.extend(repeatedCellsInRow)
 
-                    # repeatedCellsInRow = list(filter(lambda checkCell: checkCell.pos == cell.pos, bestParent.pieces[row]))
-                    # repeatedCells.extend(repeatedCellsInRow)
+            # # print('Melhor linha: ', list(map(lambda x: x.pos, selectedRow)))
+            # # print('Linha a ser substituída do melhor pai: ', list(map(lambda x: x.pos, bestParent.pieces[parent1BestRow])))
+            # # print(list(map(lambda x: x['position'], repeatedCells)))
+            # # print('Peças repetidas: ', list(map(lambda x: x['cell'].pos, repeatedCells)))
 
-            print('Melhor linha: ', list(map(lambda x: x.pos, selectedRow)))
-            print('Linha a ser substituída do melhor pai: ', list(map(lambda x: x.pos, bestParent.pieces[parent1BestRow])))
-            # print(list(map(lambda x: x['position'], repeatedCells)))
-            print('Peças repetidas: ', list(map(lambda x: x['cell'].pos, repeatedCells)))
+            # bestParent.pieces[parent1BestRow]
+            # piecesToReplace = []
+            # for cell in bestParent.pieces[parent1BestRow]:
 
-            bestParent.pieces[parent1BestRow]
-            piecesToReplace = []
-            for cell in bestParent.pieces[parent1BestRow]:
+            #     includeOnReplacement = True
 
-                includeOnReplacement = True
-
-                for replacementCell in selectedRow:
-                    if (replacementCell.pos == cell.pos):
-                        includeOnReplacement = False
-                        break
+            #     for replacementCell in selectedRow:
+            #         if (replacementCell.pos == cell.pos):
+            #             includeOnReplacement = False
+            #             break
                 
-                if (includeOnReplacement):
-                    piecesToReplace.append(cell)
+            #     if (includeOnReplacement):
+            #         piecesToReplace.append(cell)
 
-            print('Peças a serem recolocadas: ', list(map(lambda x: x.pos, piecesToReplace)))
+            # # print('Peças a serem recolocadas: ', list(map(lambda x: x.pos, piecesToReplace)))
 
-            # Adicionamos ao filho a melhor linha entre os dois pais
-            child.pieces[parent1BestRow] = selectedRow
+            # # Adicionamos ao filho a melhor linha entre os dois pais
+            # child.pieces[parent1BestRow] = selectedRow
 
-            for repeatedCell in range(0, len(repeatedCells)):
-                [row, col] = repeatedCells[repeatedCell]['position']
-                child.pieces[row][col] = deepcopy(piecesToReplace[repeatedCell])
+            # for repeatedCell in range(0, len(repeatedCells)):
+            #     [row, col] = repeatedCells[repeatedCell]['position']
+            #     child.pieces[row][col] = deepcopy(piecesToReplace[repeatedCell])
 
             print('Fitness filho: ', child.fitness_relative())
 
-            print('Pai 1')
-            for row in self.pieces:
-                print(list(map(lambda x: x.pos, row)))
+            # print('Pai 1')
+            # for row in self.pieces:
+            #     print(list(map(lambda x: x.pos, row)))
 
-            print('Pai 2')
-            for row in other_proposed_solution.pieces:
-                print(list(map(lambda x: x.pos, row)))
+            # print('Pai 2')
+            # for row in other_proposed_solution.pieces:
+            #     print(list(map(lambda x: x.pos, row)))
 
-            print('Filho')
-            for row in child.pieces:
-                print(list(map(lambda x: x.pos, row)))
+            # print('Filho')
+            # for row in child.pieces:
+            #     print(list(map(lambda x: x.pos, row)))
 
 
             return child
@@ -281,11 +285,30 @@ class ProposedSolution(PiecesManager):
 
             # Adicionamos em 2 linhas do filho, as melhores linhas de cada um dos pais
             child.pieces[parent1BestRow] = deepcopy(self.pieces[parent1BestRow])
+            child = handleWithRepeatedCells(child, bestParent, parent1BestRow, self.pieces[parent1BestRow])
+
             child.pieces[parent2BestRow] = deepcopy(other_proposed_solution.pieces[parent2BestRow])
+            child = handleWithRepeatedCells(child, bestParent, parent2BestRow, other_proposed_solution.pieces[parent2BestRow])
             
             print('Fitness filho: ', child.fitness_relative())
             return child
        
+
+    def correct_solution(self):
+        remaining_set = self.pieces_set - set(self.pieces.flatten())
+        track_set = set()
+
+        new_pieces = []
+        for piece in self.pieces.flatten():
+            if piece not in track_set:
+                new_pieces.append(piece)
+            else:
+                new_pieces.append(remaining_set.pop())
+            track_set.add(piece)
+
+        self.pieces = np.array(new_pieces).reshape(self.pieces.shape)
+
+        
     def fitness_absolute(self):
         """
         Conta o numero de peças na posição incorreta
@@ -343,3 +366,40 @@ def getBestRow (pieces):
             bestRowValue = rowValuation
 
     return (bestRow, bestRowValue)
+
+
+def handleWithRepeatedCells (child, parent, changedRow, selectedRow):
+    repeatedCells = []
+    for cell in selectedRow:
+        for row in range(0, len(parent.pieces)):
+            if (row == changedRow):
+                continue;
+            for col in range(0, len(parent.pieces[row])):
+                if (parent.pieces[row][col].pos == cell.pos):
+                    dict = {}
+                    dict['cell'] = cell
+                    dict['position'] = (row, col)
+                    repeatedCells.append(dict)
+
+    parent.pieces[changedRow]
+    piecesToReplace = []
+    for cell in parent.pieces[changedRow]:
+
+        includeOnReplacement = True
+
+        for replacementCell in selectedRow:
+            if (replacementCell.pos == cell.pos):
+                includeOnReplacement = False
+                break
+        
+        if (includeOnReplacement):
+            piecesToReplace.append(cell)
+
+    # Adicionamos ao filho a melhor linha entre os dois pais
+    child.pieces[changedRow] = selectedRow
+
+    for repeatedCell in range(0, len(repeatedCells)):
+        [row, col] = repeatedCells[repeatedCell]['position']
+        child.pieces[row][col] = deepcopy(piecesToReplace[repeatedCell])
+
+    return deepcopy(child)

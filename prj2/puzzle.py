@@ -60,9 +60,3 @@ class Puzzle(PiecesManager):
             factorial = factorial * value
             value = value - 1
         return factorial
-
-
-
-
-
-

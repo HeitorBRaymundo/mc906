@@ -3,12 +3,10 @@ def extermination(population, new_population):
     return new_population
 
 def elitism(best_individual, new_population):
-    new_population.sort()
-    
     new_population.pop()
     new_population.append(best_individual)
     
-    return new_population.sort()
+    return new_population
 
 def steady_state(population, new_population, steady_rate=0.1):
     number_of_individuals_to_replace = int(len(population) * steady_rate)
@@ -18,4 +16,4 @@ def steady_state(population, new_population, steady_rate=0.1):
     for i in range(number_of_individuals_to_replace):
         new_population.append(population[i])
     
-    return new_population.sort
+    return new_population
