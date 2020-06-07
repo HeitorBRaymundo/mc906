@@ -6,6 +6,7 @@ from copy import deepcopy
 
 from selection import roulette_selection, tournament_selection
 from replacement import elitism, steady_state
+from crossover import crossover_simplified_sholomon
 from utils import plot_image
 from custom_statistics import Statistics
 
@@ -21,7 +22,7 @@ def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10,
         ga.iterate()
         plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
 
-    ga.statistics.print()
+    #ga.statistics.print()
     print(ga)
 
 
@@ -192,7 +193,12 @@ class ProposedSolution(PiecesManager):
             self.pieces[randFromRow][randFromCol] = toCel
 
     def crossover1(self, other_proposed_solution):
-        raise NotImplementedError()
+        rows = len(self.pieces)
+        cols = len(self.pieces[0])
+        child_pieces = crossover_simplified_sholomon(self.pieces, other_proposed_solution.pieces, rows, cols)
+        child = ProposedSolution(child_pieces)
+        child.correct_solution()
+        return child
 
     def crossover2(self, other_proposed_solution):
 
