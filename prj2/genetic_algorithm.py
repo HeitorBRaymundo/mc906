@@ -117,16 +117,20 @@ class GeneticAlgorithm:
         # seleciona candidatos a pais (ordenados)
         selected_parents = self._selection()
 
-        print('passou aqui')
-
         # crossover entre dois individuos
         next_gen = []
         for i in range(1, len(selected_parents), 2):
             parent1 = selected_parents[i-1]
             parent2 = selected_parents[i]
-            child1, child2 = self._crossover(parent1, parent2)
-            next_gen.extend([child1, child2])
+            # child1, child2 = self._crossover(parent1, parent2)
+            child1 = self._crossover(parent1, parent2)
+            # next_gen.extend([child1, child2])
+            next_gen.extend([child1])
+            elementsToClone = len(self.population) - len(next_gen)
+            clonedElements = self.population[:elementsToClone]
+            next_gen.extend(clonedElements)
 
+        next_gen = self._mutation(next_gen)
         # avalia fitness e ordena next_gen
         self._eval_fitness(next_gen)
         next_gen.sort()
@@ -199,15 +203,15 @@ class ProposedSolution(PiecesManager):
         [parent1BestRow, parent1BestRowValue] = getBestRow(self.pieces)
         [parent2BestRow, parent2BestRowValue] = getBestRow(other_proposed_solution.pieces)
 
-        print('Parent 1 best row:', parent1BestRow, 'Parent 2 best row:', parent2BestRow)
+        # print('Parent 1 best row:', parent1BestRow, 'Parent 2 best row:', parent2BestRow)
 
         parent1Fitness = self.fitness_relative()
         parent2Fitness = other_proposed_solution.fitness_relative()
         bestParent = self if parent1Fitness < parent2Fitness else other_proposed_solution
 
 
-        print('Fitness pai 1: ', parent1Fitness)
-        print('Fitness pai 2: ', parent2Fitness)
+        # print('Fitness pai 1: ', parent1Fitness)
+        # print('Fitness pai 2: ', parent2Fitness)
 
         sameRow = parent1BestRow == parent2BestRow
         if (sameRow):
@@ -263,7 +267,7 @@ class ProposedSolution(PiecesManager):
             #     [row, col] = repeatedCells[repeatedCell]['position']
             #     child.pieces[row][col] = deepcopy(piecesToReplace[repeatedCell])
 
-            print('Fitness filho: ', child.fitness_relative())
+            # print('Fitness filho: ', child.fitness_relative())
 
             # print('Pai 1')
             # for row in self.pieces:
@@ -290,7 +294,7 @@ class ProposedSolution(PiecesManager):
             child.pieces[parent2BestRow] = deepcopy(other_proposed_solution.pieces[parent2BestRow])
             child = handleWithRepeatedCells(child, bestParent, parent2BestRow, other_proposed_solution.pieces[parent2BestRow])
             
-            print('Fitness filho: ', child.fitness_relative())
+            # print('Fitness filho: ', child.fitness_relative())
             return child
        
 
