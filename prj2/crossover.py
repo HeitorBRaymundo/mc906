@@ -12,7 +12,7 @@ def crossover_simplified_sholomon(parent1, parent2, max_rows, max_columns):
     total_pieces = (max_columns * max_rows)
     child_pieces_count = 0
 
-    # indicates whether position has a piece or not in child
+    # indicates wheter position has a piece or not in child
     child_map = numpy.zeros((max_rows, max_columns)) 
 
     child = deepcopy(parent1)
@@ -20,17 +20,17 @@ def crossover_simplified_sholomon(parent1, parent2, max_rows, max_columns):
     # check if child is complete
     while child_pieces_count < total_pieces:
         # apply sholomon A phase
-        new_selected_piece = simplified_sholomon_A_phase(parent1, parent2, selected_row, selected_column, max_rows, max_columns, child) 
+        new_selected_piece, selected_row, selected_column = simplified_sholomon_A_phase(parent1, parent2, selected_row, selected_column, max_rows, max_columns, child) 
 
         if new_selected_piece != None:
-            child[new_selected_piece.pos[1]][new_selected_piece.pos[0]] = new_selected_piece
-            child_map[new_selected_piece.pos[1]][new_selected_piece.pos[0]] = 1
+            child[selected_row][selected_column] = new_selected_piece
+            child_map[selected_row][selected_column] = 1
             child_pieces_count += 1
         else:
             # if parents do not agree about any neighbor, choose one at random (phase B)
-            new_selected_piece = simplified_sholomon_B_phase(parent1, parent2, selected_row, selected_column, max_rows, max_columns, child) 
-            child[new_selected_piece.pos[1]][new_selected_piece.pos[0]] = new_selected_piece
-            child_map[new_selected_piece.pos[1]][new_selected_piece.pos[0]] = 1
+            new_selected_piece, selected_row, selected_column = simplified_sholomon_B_phase(parent1, parent2, selected_row, selected_column, max_rows, max_columns, child) 
+            child[selected_row][selected_column] = new_selected_piece
+            child_map[selected_row][selected_column] = 1
             child_pieces_count += 1
 
     return child
@@ -40,35 +40,45 @@ def crossover_simplified_sholomon(parent1, parent2, max_rows, max_columns):
 def simplified_sholomon_A_phase(parent1, parent2, selected_row, selected_column, max_rows, max_columns, child):
 
     agreeded_pieces = []
+    agreeded_row_pos = []
+    agreeded_column_pos = []
 
     if selected_column > 0:
         if (parent1[selected_row][selected_column - 1] == parent2[selected_row][selected_column - 1]) and child[selected_row][selected_column - 1] == 0:
             # parents agree about left neighbor of selected piece
             
             agreeded_pieces.append(parent1[selected_row][selected_column - 1])
+            agreeded_row_pos.append(selected_row)
+            agreeded_column_pos.append(selected_column - 1)
     if selected_row > 0:
         if (parent1[selected_row - 1][selected_column] == parent2[selected_row -1][selected_column]) and child[selected_row - 1][selected_column] == 0:
             # parents agree about top neighbor of selected piece
             
             agreeded_pieces.append(parent1[selected_row - 1][selected_column])
-    if selected_column < max_rows - 1:
-        if (parent1[selected_row][selected_column + 1] == parent2[selected_row][selected_column + 1]) and child[selected_row][selected_column + 1] == 0:
+            agreeded_row_pos.append(selected_row - 1)
+            agreeded_column_pos.append(selected_column)
+    if selected_row < max_rows - 1:
+        if (parent1[selected_row + 1][selected_column] == parent2[selected_row + 1][selected_column]) and child[selected_row + 1][selected_column] == 0:
             # parents agree about right neighbor of selected piece
             
-            agreeded_pieces.append(parent1[selected_row][selected_column + 1])
+            agreeded_pieces.append(parent1[selected_row + 1][selected_column])
+            agreeded_row_pos.append(selected_row + 1)
+            agreeded_column_pos.append(selected_column)
     if selected_column < max_columns - 1:
         if (parent1[selected_row][selected_column + 1] == parent2[selected_row][selected_column + 1]) and child[selected_row][selected_column - 1] == 0:
             # parents agree about right neighbor of selected piece
         
             agreeded_pieces.append(parent1[selected_row][selected_column + 1])
+            agreeded_row_pos.append(selected_row)
+            agreeded_column_pos.append(selected_column)
 
     agreeded_pieces_count = len(agreeded_pieces)
     if agreeded_pieces_count > 0:
         # if there is more than one agreeded piece than choose one randomly
         index = random.randint(0, agreeded_pieces_count - 1)
-        return agreeded_pieces[index]
+        return agreeded_pieces[index], agreeded_row_pos[index], agreeded_column_pos[index]
     else:    
-        return None 
+        return None, selected_row, selected_column 
 
 def simplified_sholomon_B_phase(parent1, parent2, selected_row, selected_column, max_rows, max_columns, child):
     
@@ -105,6 +115,6 @@ def simplified_sholomon_B_phase(parent1, parent2, selected_row, selected_column,
 
     # returns a random available neighbor of selected piece
     if random_parent ==  0:
-        return parent1[selected_row][selected_column]
+        return parent1[selected_row][selected_column], selected_row, selected_column
     else:
-        return parent2[selected_row][selected_column]
+        return parent2[selected_row][selected_column], selected_row, selected_column
