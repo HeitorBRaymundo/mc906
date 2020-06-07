@@ -128,9 +128,10 @@ class GeneticAlgorithm:
             child1 = self._crossover(parent1, parent2)
             # next_gen.extend([child1, child2])
             next_gen.extend([child1])
-            elementsToClone = len(self.population) - len(next_gen)
-            clonedElements = self.population[:elementsToClone]
-            next_gen.extend(clonedElements)
+            
+        elementsToClone = len(self.population) - len(next_gen)
+        clonedElements = self.population[:elementsToClone]
+        next_gen.extend(clonedElements)
 
         next_gen = self._mutation(next_gen)
         # avalia fitness e ordena next_gen
