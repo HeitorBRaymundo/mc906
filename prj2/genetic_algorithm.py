@@ -218,22 +218,26 @@ class ProposedSolution(PiecesManager):
                 else deepcopy(other_proposed_solution.pieces[parent2BestRow])
 
             # O filho terá a maior parte do cromossomo sendo do melhor pai
-            child = deepcopy(bestParent)
+            child = bestParent
+
+            child.pieces[parent1BestRow] = selectedRow
             
             #child = handleWithRepeatedCells(child, bestParent, parent1BestRow, selectedRow)
 
+            child.correct_solution()
             return child
         else:
             # O filho terá a maior parte do cromossomo sendo do melhor pai
-            child = deepcopy(bestParent)
+            child = bestParent
 
             # Adicionamos em 2 linhas do filho, as melhores linhas de cada um dos pais
-            child.pieces[parent1BestRow] = deepcopy(self.pieces[parent1BestRow])
+            child.pieces[parent1BestRow] = self.pieces[parent1BestRow]
             #child = handleWithRepeatedCells(child, bestParent, parent1BestRow, self.pieces[parent1BestRow])
 
-            child.pieces[parent2BestRow] = deepcopy(other_proposed_solution.pieces[parent2BestRow])
+            child.pieces[parent2BestRow] = other_proposed_solution.pieces[parent2BestRow]
             # child = handleWithRepeatedCells(child, bestParent, parent2BestRow, other_proposed_solution.pieces[parent2BestRow])
             
+            child.correct_solution()
             return child
        
 
