@@ -192,8 +192,100 @@ class ProposedSolution(PiecesManager):
         raise NotImplementedError()
 
     def crossover2(self, other_proposed_solution):
-        raise NotImplementedError()
 
+        [parent1BestRow, parent1BestRowValue] = getBestRow(self.pieces)
+        [parent2BestRow, parent2BestRowValue] = getBestRow(other_proposed_solution.pieces)
+
+        print('Parent 1 best row:', parent1BestRow, 'Parent 2 best row:', parent2BestRow)
+
+        parent1Fitness = self.fitness_relative()
+        parent2Fitness = other_proposed_solution.fitness_relative()
+        bestParent = self if parent1Fitness < parent2Fitness else other_proposed_solution
+
+
+        print('Fitness pai 1: ', parent1Fitness)
+        print('Fitness pai 2: ', parent2Fitness)
+
+        sameRow = parent1BestRow == parent2BestRow
+        if (sameRow):
+            # Quando a melhor linha dos dois pais forem a mesma, vamos escolher a melhor entre elas
+            selectedRow = deepcopy(self.pieces[parent1BestRow]) \
+                if parent1BestRowValue < parent2BestRowValue \
+                else deepcopy(other_proposed_solution.pieces[parent2BestRow])
+
+            # O filho terá a maior parte do cromossomo sendo do melhor pai
+            child = deepcopy(bestParent)
+
+            repeatedCells = []
+            for cell in selectedRow:
+                for row in range(0, len(bestParent.pieces)):
+                    if (row == parent1BestRow):
+                        continue;
+                    for col in range(0, len(bestParent.pieces[row])):
+                        if (bestParent.pieces[row][col].pos == cell.pos):
+                            dict = {}
+                            dict['cell'] = cell
+                            dict['position'] = (row, col)
+                            repeatedCells.append(dict)
+
+                    # repeatedCellsInRow = list(filter(lambda checkCell: checkCell.pos == cell.pos, bestParent.pieces[row]))
+                    # repeatedCells.extend(repeatedCellsInRow)
+
+            print('Melhor linha: ', list(map(lambda x: x.pos, selectedRow)))
+            print('Linha a ser substituída do melhor pai: ', list(map(lambda x: x.pos, bestParent.pieces[parent1BestRow])))
+            # print(list(map(lambda x: x['position'], repeatedCells)))
+            print('Peças repetidas: ', list(map(lambda x: x['cell'].pos, repeatedCells)))
+
+            bestParent.pieces[parent1BestRow]
+            piecesToReplace = []
+            for cell in bestParent.pieces[parent1BestRow]:
+
+                includeOnReplacement = True
+
+                for replacementCell in selectedRow:
+                    if (replacementCell.pos == cell.pos):
+                        includeOnReplacement = False
+                        break
+                
+                if (includeOnReplacement):
+                    piecesToReplace.append(cell)
+
+            print('Peças a serem recolocadas: ', list(map(lambda x: x.pos, piecesToReplace)))
+
+            # Adicionamos ao filho a melhor linha entre os dois pais
+            child.pieces[parent1BestRow] = selectedRow
+
+            for repeatedCell in range(0, len(repeatedCells)):
+                [row, col] = repeatedCells[repeatedCell]['position']
+                child.pieces[row][col] = deepcopy(piecesToReplace[repeatedCell])
+
+            print('Fitness filho: ', child.fitness_relative())
+
+            print('Pai 1')
+            for row in self.pieces:
+                print(list(map(lambda x: x.pos, row)))
+
+            print('Pai 2')
+            for row in other_proposed_solution.pieces:
+                print(list(map(lambda x: x.pos, row)))
+
+            print('Filho')
+            for row in child.pieces:
+                print(list(map(lambda x: x.pos, row)))
+
+
+            return child
+        else:
+            # O filho terá a maior parte do cromossomo sendo do melhor pai
+            child = deepcopy(bestParent)
+
+            # Adicionamos em 2 linhas do filho, as melhores linhas de cada um dos pais
+            child.pieces[parent1BestRow] = deepcopy(self.pieces[parent1BestRow])
+            child.pieces[parent2BestRow] = deepcopy(other_proposed_solution.pieces[parent2BestRow])
+            
+            print('Fitness filho: ', child.fitness_relative())
+            return child
+       
     def fitness_absolute(self):
         """
         Conta o numero de peças na posição incorreta
@@ -227,3 +319,27 @@ class ProposedSolution(PiecesManager):
 
     def __lt__(self, other):
         return self.fitness < other.fitness
+
+
+def getBestRow (pieces):
+    bestRow = 0
+    bestRowValue = 980988080808088098098
+
+    for row in range(0, len(pieces)):
+        rowValuation = 0
+
+        for col in range(0, len(pieces[row])):
+            cell = pieces[row][col]
+            up = pieces[row - 1][col] if row > 0 else None
+            down = pieces[row + 1][col] if row < len(pieces) - 1 else None
+            left = pieces[row][col - 1] if col > 0 else None
+            right = pieces[row][col + 1] if col < len(pieces[row]) - 1 else None
+
+            cellEvaluation = cell.eval_relative(up, right, down, left)
+            rowValuation += cellEvaluation
+    
+        if (rowValuation < bestRowValue):
+            bestRow = row
+            bestRowValue = rowValuation
+
+    return (bestRow, bestRowValue)
