@@ -1,3 +1,5 @@
+import time
+
 import matplotlib.pyplot as plt
 
 def plot_image(*images, titles=[], table_format=(1, 0), figsize=(15, 15), axis=False, fontsize=20):
@@ -27,3 +29,19 @@ def animate(*images, delay):
 
 def plot_evolution_graph(*metrics):
     raise NotImplementedError()
+
+class Timer:
+
+    def __init__(self, time_passed):
+        self._start = None
+        self.time_passed = time_passed
+        self.start()
+
+    def start(self):
+        self._start = time.time()
+
+    def check(self):
+        if (time.time() - self._start) > self.time_passed:
+            self.start()
+            return True
+        return False

@@ -72,6 +72,8 @@ def crossover3(parent1, parent2):
 
     if random.randint(0, 1):
 
+
+        """
         agg_sum_parent1 = [0]
         for i, fitness in enumerate(parent1.fitness_row):
             agg_sum_parent1.append(agg_sum_parent1[i - 1] + fitness)
@@ -79,8 +81,11 @@ def crossover3(parent1, parent2):
         agg_sum_parent2 = [0]
         for i, fitness in enumerate(parent2.fitness_row[::-1]):
             agg_sum_parent2.append(agg_sum_parent2[i - 1] + fitness)
-
+        
         split_point = np.argmin(list(map(np.add, agg_sum_parent1, agg_sum_parent2))[1:])
+        """
+
+        split_point = random.randint(1, parent1.pieces.shape[0]-1)
 
         pieces_child1[:split_point, :] = parent1.pieces[:split_point, :]
         pieces_child1[split_point:, :] = parent2.pieces[split_point:, :]
@@ -88,8 +93,11 @@ def crossover3(parent1, parent2):
         pieces_child2[:split_point, :] = parent2.pieces[:split_point, :]
         pieces_child2[split_point:, :] = parent1.pieces[split_point:, :]
 
+        #print(split_point)
+
     else:
 
+        """
         agg_sum_parent1 = [0]
         for i, fitness in enumerate(parent1.fitness_column):
             agg_sum_parent1.append(agg_sum_parent1[i - 1] + fitness)
@@ -97,13 +105,18 @@ def crossover3(parent1, parent2):
         agg_sum_parent2 = [0]
         for i, fitness in enumerate(parent2.fitness_column[::-1]):
             agg_sum_parent2.append(agg_sum_parent2[i - 1] + fitness)
-
+            
         split_point = np.argmin(list(map(np.add, agg_sum_parent1, agg_sum_parent2))[1:])
+        """
+        split_point = random.randint(1, parent1.pieces.shape[1]-1)
 
         pieces_child1[:, :split_point] = parent1.pieces[:, :split_point]
         pieces_child1[:, split_point:] = parent2.pieces[:, split_point:]
 
         pieces_child2[:, :split_point] = parent2.pieces[:, :split_point]
         pieces_child2[:, split_point:] = parent1.pieces[:, split_point:]
+
+        #print(split_point)
+
 
     return ProposedSolution(pieces_child1), ProposedSolution(pieces_child2)

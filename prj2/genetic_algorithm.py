@@ -1,24 +1,31 @@
 import random
+import time
+
 from proposed_solution import ProposedSolution
 
 from selection import roulette_selection, tournament_selection
 from crossover import crossover1, crossover2, crossover3
 from mutation import mutation1, mutation2
 from replacement import elitism, steady_state
-from utils import plot_image
+from utils import plot_image, Timer
 from custom_statistics import Statistics
 
 
 def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
                           selection='roulette', mutation='mutation1', replace='replace_elitism',
-                          crossover='crossover1'):
+                          crossover='crossover1', report_time=3):
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, mutation_rate=mutation_rate, fitness=fitness,
                           selection=selection, crossover=crossover, mutation=mutation, replace=replace)
 
+    timer = Timer(report_time)
     # plota melhor individuo
     while ga.iterations < max_iterations and not ga.stop_criteria():
         # print(len(ga.population))
         ga.iterate()
+        if timer.check():
+            ga.statistics.print()
+
+        #
 
     plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
 
