@@ -2,7 +2,6 @@ import random
 import numpy
 from copy import deepcopy
 
-
 # Simplified sholomon crossover generates a single child
 def crossover_simplified_sholomon(parent1, parent2, max_rows, max_columns):
 
@@ -23,30 +22,23 @@ def crossover_simplified_sholomon(parent1, parent2, max_rows, max_columns):
     while child_pieces_count < total_pieces:
         # apply sholomon A phase
         new_selected_piece, selected_row, selected_column = simplified_sholomon_A_phase(parent1, parent2, selected_row, selected_column, max_rows, max_columns, child_map, added_pieces) 
+        
+        if new_selected_piece == None:
 
-        if new_selected_piece != None:
-            child[selected_row][selected_column] = new_selected_piece
-            child_map[selected_row][selected_column] = 1
-            child_pieces_count += 1
-            added_pieces.append(new_selected_piece)
-            pieces_bank = remove_from_bank(new_selected_piece, pieces_bank)
-        else:
-            # if parents do not agree about any neighbor, choose one at random (phase B)
+             # if parents do not agree about any neighbor, choose one at random (phase B)
             # new_selected_piece, selected_row, selected_column = simplified_sholomon_B_phase(parent1, parent2, selected_row, selected_column, max_rows, max_columns, child_map, added_pieces)     
-            # if is_new_piece(added_pieces, new_selected_piece): 
-            #     child[selected_row][selected_column] = new_selected_piece
-            #     child_map[selected_row][selected_column] = 1
-            #     child_pieces_count += 1
-            #     added_pieces.append(new_selected_piece)
-            #     pieces_bank = remove_from_bank(new_selected_piece, pieces_bank)
-            # else:
+            # if new_selected_piece == None or not is_new_piece(added_pieces, new_selected_piece):
+               
+            # if there's no available piece from phase B, then apply phase C
             new_selected_piece = simplified_sholomon_C_phase(pieces_bank)
-            selected_row, selected_column = get_random_available_pos(child_map, max_rows, max_columns)
-            child[selected_row][selected_column] = new_selected_piece
-            child_map[selected_row][selected_column] = 1
-            child_pieces_count += 1
-            added_pieces.append(new_selected_piece)
-            pieces_bank = remove_from_bank(new_selected_piece, pieces_bank)
+            selected_row, selected_column = get_random_available_pos(child_map, max_rows, max_columns) 
+                
+        child[selected_row][selected_column] = new_selected_piece
+        child_map[selected_row][selected_column] = 1
+        child_pieces_count += 1
+        added_pieces.append(new_selected_piece)
+        pieces_bank = remove_from_bank(new_selected_piece, pieces_bank)
+
     return child
 
 # the idea of phase A is to find out, for a selected piece, which neighbors both parents agree about (which neighbors are equal in parent1 and parent2)
@@ -98,40 +90,35 @@ def simplified_sholomon_B_phase(parent1, parent2, selected_row, selected_column,
     
     # select either parent1 or parent2 
     random_parent = random.randint(0, 1) 
-    possible_rows_pos = []
-    possible_column_pos = []
+    possible_neighbor_pos = [] # (x, y) neighbor positions
 
-    # check which neighbors exist
-    if selected_row > 0:
-        possible_rows_pos.append(selected_row - 1)
-    if selected_row < max_rows - 1:
-        possible_rows_pos.append(selected_row + 1)
-    if selected_column > 0:
-        possible_column_pos.append(selected_column - 1)
-    if selected_column < max_columns - 1:
-        possible_column_pos.append(selected_column + 1)
+    # check which neighbors is available
+    if selected_row > 0 and child[selected_row - 1][selected_column] == 0:
+        possible_neighbor_pos.append((selected_row - 1, selected_column))
+    if selected_row < max_rows - 1 and child[selected_row + 1][selected_column] == 0:
+        possible_neighbor_pos.append((selected_row + 1, selected_column))
+    if selected_column > 0 and child[selected_row][selected_column - 1] == 0:
+        possible_neighbor_pos.append((selected_row, selected_column - 1))
+    if selected_column < max_columns - 1 and child[selected_row][selected_column + 1] == 0:
+        possible_neighbor_pos.append((selected_row, selected_column + 1))
 
-    possible_rows_count = len(possible_rows_pos)
-    possible_column_count = len(possible_column_pos)
+    possible_neighbors_count = len(possible_neighbor_pos)
 
-    random_row_index = random.randint(0, possible_rows_count - 1)
-    random_column_index = random.randint(0, possible_column_count - 1)
+    if possible_neighbors_count > 0:
 
-    selected_row = possible_rows_pos[random_row_index]
-    selected_column = possible_column_pos[random_column_index]
+        random_neighbor_index = random.randint(0, possible_neighbors_count - 1)
 
-    # check if selected position is not already filled in child 
-    while child[selected_row][selected_column] == 1: 
-        random_row_index = random.randint(0, possible_rows_count - 1)
-        random_column_index = random.randint(0, possible_column_count - 1)
-        selected_row = possible_rows_pos[random_row_index]
-        selected_column = possible_column_pos[random_column_index]
+        selected_neighbor_pos = possible_neighbor_pos[random_neighbor_index]
 
-    # returns a random available neighbor of selected piece
-    if random_parent ==  0:
-        return parent1[selected_row][selected_column], selected_row, selected_column
-    else:
-        return parent2[selected_row][selected_column], selected_row, selected_column
+        print("x: " + str(selected_neighbor_pos[0]) + " y: " + str(selected_neighbor_pos[1]))
+
+        # returns a random available neighbor of selected piece
+        if random_parent ==  0:
+            return parent1[selected_neighbor_pos[0]][selected_neighbor_pos[1]], selected_row, selected_column
+        else:
+            return parent2[selected_neighbor_pos[0]][selected_neighbor_pos[1]], selected_row, selected_column
+    
+    return None, selected_row, selected_column
 
 def is_new_piece(added_pieces, candidate_piece):
     for added_piece in added_pieces:
@@ -141,7 +128,6 @@ def is_new_piece(added_pieces, candidate_piece):
 
 def simplified_sholomon_C_phase(pieces_bank):
     rand_index = random.randint(0, len(pieces_bank) - 1)
-    
     return pieces_bank[rand_index]
 
 def remove_from_bank(added_piece, pieces_bank):
@@ -166,5 +152,4 @@ def get_random_available_pos(child_pieces_map, max_rows, max_columns):
         row_index = random.randint(0, max_rows - 1)
         column_index = random.randint(0, max_columns - 1)
     return row_index, column_index
-
 
