@@ -197,7 +197,7 @@ class ProposedSolution(PiecesManager):
         cols = len(self.pieces[0])
         child_pieces = crossover_simplified_sholomon(self.pieces, other_proposed_solution.pieces, rows, cols)
         child = ProposedSolution(child_pieces)
-        child.correct_solution()
+        # child.correct_solution()
         return child
 
     def crossover2(self, other_proposed_solution):

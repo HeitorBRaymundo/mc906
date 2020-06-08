@@ -3,7 +3,7 @@ from utils import plot_image
 from puzzle import Puzzle
 from utils import plot_image
 
-puzzle = Puzzle('imgs/triforce.png', 4, 4)
+puzzle = Puzzle('imgs/triforce.png', 3, 3)
 ps1 = ProposedSolution(puzzle.gen_shuffle_pieces())
 ps2 = ProposedSolution(puzzle.gen_shuffle_pieces())
 
