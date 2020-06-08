@@ -7,6 +7,7 @@ class Piece:
         self.image_pad = np.pad(self.image, ((1, 1), (1, 1), (0, 0)), 'constant', constant_values=0)
         self.pos = (posX, posY)
         self.neighbors = (None, None, None, None)
+        self.fitness = np.inf
 
     def set_neighbors(self, up, right, down, left):
         self.neighbors = (up, right, down, left)
@@ -15,8 +16,9 @@ class Piece:
         return int((posX, posY) == self.pos)
 
     def eval_relative(self, up, right, down, left):
-        return int(up == self.neighbors[0]) + int(right == self.neighbors[1]) + \
+        self.fitness = int(up == self.neighbors[0]) + int(right == self.neighbors[1]) + \
                int(down == self.neighbors[2]) + int(left == self.neighbors[3])
+        return self.fitness
 
 
 class PiecesManager:

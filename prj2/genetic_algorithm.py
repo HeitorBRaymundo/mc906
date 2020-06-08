@@ -1,25 +1,26 @@
-from piece import PiecesManager
-import numpy as np
 import random
-import math
-from copy import deepcopy
+from proposed_solution import ProposedSolution
 
 from selection import roulette_selection, tournament_selection
+from crossover import crossover1, crossover2, crossover3
+from mutation import mutation1, mutation2
 from replacement import elitism, steady_state
 from utils import plot_image
 from custom_statistics import Statistics
 
-def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
-                          selection='roulette', mutation='mutation1', replace='replace_elitism', crossover='crossover1'):
 
+def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
+                          selection='roulette', mutation='mutation1', replace='replace_elitism',
+                          crossover='crossover1'):
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, mutation_rate=mutation_rate, fitness=fitness,
                           selection=selection, crossover=crossover, mutation=mutation, replace=replace)
 
     # plota melhor individuo
-    plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
     while ga.iterations < max_iterations and not ga.stop_criteria():
+        # print(len(ga.population))
         ga.iterate()
-        plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
+
+    plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
 
     ga.statistics.print()
     print(ga)
@@ -28,6 +29,7 @@ def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10,
 class GeneticAlgorithm:
 
     def __init__(self, puzzle, size, mutation_rate, fitness, selection, crossover, mutation, replace):
+        self.puzzle = puzzle
         self.population = []
         self.mutation_rate = mutation_rate
         self.fitness = fitness
@@ -37,9 +39,9 @@ class GeneticAlgorithm:
         self.crossover = crossover
         self.size = size
         self.statistics = Statistics()
-        self.selection_count = round(size/2)
+        self.selection_count = round(size / 2)
         self.replacement_rate = 0.1
-
+        self.pieces_set = set(puzzle.pieces.flatten())
 
         # inicializa populacao de forma randomica
         for i in range(size):
@@ -51,7 +53,6 @@ class GeneticAlgorithm:
 
         self.population.sort()
         self.iterations = 0
-
 
     def _eval_fitness(self, population):
         # chama o metodo fitness_absolute ou fitness_relative de cada individuo
@@ -98,15 +99,33 @@ class GeneticAlgorithm:
         # chamar metodo de mutação selecionado por self.mutation:
         for indv in population:
             checkRate = random.randint(0, 100)
-            if (checkRate <= self.mutation_rate):
-                getattr(indv,'{}'.format(self.mutation))()
+            if checkRate <= self.mutation_rate:
+                getattr(self, '_{}'.format(self.mutation))(indv)
         return population
+
+    def _mutation1(self, indv):
+        mutation1(indv)
+
+    def _mutation2(self, indv):
+        mutation2(indv)
 
     def _crossover(self, parent1, parent2):
         '''
         faz crossover entre duas proposed solutions
         '''
-        return getattr(parent1, self.crossover)(parent2)
+        return getattr(self, '_{}'.format(self.crossover))(parent1, parent2)
+
+    def _crossover1(self, parent1, parent2):
+        return crossover1(parent1, parent2)
+
+    def _crossover2(self, parent1, parent2):
+        return crossover2(parent1, parent2)
+
+    def _crossover3(self, parent1, parent2):
+        child1, child2 = crossover3(parent1, parent2)
+        self.puzzle.correct_solution(child1)
+        self.puzzle.correct_solution(child2)
+        return child1, child2
 
     def _update_statistics(self):
         '''
@@ -114,24 +133,31 @@ class GeneticAlgorithm:
         '''
         self.statistics.update(self.population)
 
-    def iterate(self):
+    def _complete_next_gen_with_clones(self, next_gen):
+        elements_to_clone = len(self.population) - len(next_gen)
+        cloned_elements = self.population[:elements_to_clone]
 
+        for i in range(len(cloned_elements)):
+            cloned_elements[i] = cloned_elements[i].clone()
+
+        next_gen.extend(cloned_elements)
+
+    def iterate(self):
         # seleciona candidatos a pais (ordenados)
         selected_parents = self._selection()
 
         # crossover entre dois individuos
         next_gen = []
         for i in range(1, len(selected_parents), 2):
-            parent1 = selected_parents[i-1]
+            parent1 = selected_parents[i - 1]
             parent2 = selected_parents[i]
-            # child1, child2 = self._crossover(parent1, parent2)
-            child1 = self._crossover(parent1, parent2)
-            # next_gen.extend([child1, child2])
-            next_gen.extend([child1])
-            
-        elementsToClone = len(self.population) - len(next_gen)
-        clonedElements = self.population[:elementsToClone]
-        next_gen.extend(clonedElements)
+            child1, child2 = self._crossover(parent1, parent2)
+            next_gen.extend([child1, child2])
+
+            # child1 = self._crossover(parent1, parent2)
+            # next_gen.extend([child1])
+
+        self._complete_next_gen_with_clones(next_gen)
 
         next_gen = self._mutation(next_gen)
         # avalia fitness e ordena next_gen
@@ -149,167 +175,3 @@ class GeneticAlgorithm:
         for ps in self.population:
             string = string + str(ps.fitness) + " "
         return string
-
-
-class ProposedSolution(PiecesManager):
-    # chromosome
-
-    def __init__(self, pieces):
-        super().__init__(pieces)
-        self.fitness = np.inf
-        self.pieces_set = set(self.pieces.flatten())
-
-    def mutation1(self):
-        # Swap sequence: swapping lines
-        swapFromRow = random.randint(0, len(self.pieces) - 1)
-        swapToRow = random.randint(0, len(self.pieces) - 1)
-
-        while (swapFromRow == swapToRow):
-            swapToRow = random.randint(0, len(self.pieces) - 1)
-
-        fromRow = deepcopy(self.pieces[swapFromRow])
-        toRow = deepcopy(self.pieces[swapToRow])
-        self.pieces[swapToRow] = fromRow
-        self.pieces[swapFromRow] = toRow
-
-    def mutation2(self):
-        # Swap: swapping n cells, where n is a number calculated giving the size of the puzzle and a random rate
-        rows = len(self.pieces)
-        cols = len(self.pieces[0])
-
-        swapRate = random.randint(10, 30)/100
-        base = rows * cols
-        numberOfSwaps = int(base * swapRate)
-
-        for i in range(0, numberOfSwaps):
-            randFromRow = random.randint(0, rows - 1)
-            randFromCol = random.randint(0, cols - 1)
-
-            randToRow = random.randint(0, rows - 1)
-            randToCol = random.randint(0, cols - 1)
-
-            while (randFromCol == randToCol and randFromRow == randToRow):
-                randToRow = random.randint(0, rows - 1)
-                randToCol = random.randint(0, cols - 1)
-
-            fromCel = self.pieces[randFromRow][randFromCol]
-            toCel = self.pieces[randToRow][randToCol]
-
-            self.pieces[randToRow][randToCol] = fromCel
-            self.pieces[randFromRow][randFromCol] = toCel
-
-    def crossover1(self, other_proposed_solution):
-        raise NotImplementedError()
-
-    def crossover2(self, other_proposed_solution):
-
-        [parent1BestRow, parent1BestRowValue] = getBestRow(self.pieces)
-        [parent2BestRow, parent2BestRowValue] = getBestRow(other_proposed_solution.pieces)
-
-        parent1Fitness = self.fitness_relative()
-        parent2Fitness = other_proposed_solution.fitness_relative()
-        bestParent = self if parent1Fitness < parent2Fitness else other_proposed_solution
-
-        sameRow = parent1BestRow == parent2BestRow
-        if (sameRow):
-            # Quando a melhor linha dos dois pais forem a mesma, vamos escolher a melhor entre elas
-            selectedRow = self.pieces[parent1BestRow] \
-                if parent1BestRowValue < parent2BestRowValue \
-                else other_proposed_solution.pieces[parent2BestRow]
-
-            # O filho terá a maior parte do cromossomo sendo do melhor pai
-            child = bestParent
-
-            child.pieces[parent1BestRow] = selectedRow
-            
-            #child = handleWithRepeatedCells(child, bestParent, parent1BestRow, selectedRow)
-
-            child.correct_solution()
-            return child
-        else:
-            # O filho terá a maior parte do cromossomo sendo do melhor pai
-            child = bestParent
-
-            # Adicionamos em 2 linhas do filho, as melhores linhas de cada um dos pais
-            child.pieces[parent1BestRow] = self.pieces[parent1BestRow]
-            #child = handleWithRepeatedCells(child, bestParent, parent1BestRow, self.pieces[parent1BestRow])
-
-            child.pieces[parent2BestRow] = other_proposed_solution.pieces[parent2BestRow]
-            # child = handleWithRepeatedCells(child, bestParent, parent2BestRow, other_proposed_solution.pieces[parent2BestRow])
-            
-            child.correct_solution()
-            return child
-       
-
-    def correct_solution(self):
-        remaining_set = self.pieces_set - set(self.pieces.flatten())
-        track_set = set()
-
-        new_pieces = []
-        for piece in self.pieces.flatten():
-            if piece not in track_set:
-                new_pieces.append(piece)
-            else:
-                new_pieces.append(remaining_set.pop())
-            track_set.add(piece)
-
-        self.pieces = np.array(new_pieces).reshape(self.pieces.shape)
-
-        
-    def fitness_absolute(self):
-        """
-        Conta o numero de peças na posição incorreta
-        """
-        result = 0
-        for i in range(self.pieces.shape[0]):
-            for j in range(self.pieces.shape[1]):
-                result = result + 1 - self.pieces[i][j].eval_absolute(j, i)
-
-        self.fitness = result
-        return result
-
-    def fitness_relative(self):
-        """
-        Conta o numero total de vizinhos errados
-        """
-        result = 0
-        for i in range(self.pieces.shape[0]):
-            for j in range(self.pieces.shape[1]):
-                up = self.get_piece(i - 1, j)
-                right = self.get_piece(i, j + 1)
-                down = self.get_piece(i + 1, j)
-                left = self.get_piece(i, j - 1)
-                result = result + 4 - self.pieces[i][j].eval_relative(up, right, down, left)
-
-        self.fitness = result
-        return result
-
-    def __eq__(self, other):
-        return self.fitness == other.fitness and self.fitness == other.fitness
-
-    def __lt__(self, other):
-        return self.fitness < other.fitness
-
-
-def getBestRow (pieces):
-    bestRow = 0
-    bestRowValue = 980988080808088098098
-
-    for row in range(0, len(pieces)):
-        rowValuation = 0
-
-        for col in range(0, len(pieces[row])):
-            cell = pieces[row][col]
-            up = pieces[row - 1][col] if row > 0 else None
-            down = pieces[row + 1][col] if row < len(pieces) - 1 else None
-            left = pieces[row][col - 1] if col > 0 else None
-            right = pieces[row][col + 1] if col < len(pieces[row]) - 1 else None
-
-            cellEvaluation = cell.eval_relative(up, right, down, left)
-            rowValuation += cellEvaluation
-    
-        if (rowValuation < bestRowValue):
-            bestRow = row
-            bestRowValue = rowValuation
-
-    return (bestRow, bestRowValue)

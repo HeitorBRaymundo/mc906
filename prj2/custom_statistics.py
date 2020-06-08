@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import statistics
+import numpy as np
 
 class Statistics():
     def __init__(self):
@@ -10,7 +10,7 @@ class Statistics():
     def update(self, population):
         self.min.append(min(population))
         self.max.append(max(population))
-        #self.media.append(statistics.mean(population))
+        self.media.append(np.mean([ps.fitness for ps in population]))
 
     def print(self):
         self.print_min()

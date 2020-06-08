@@ -48,6 +48,22 @@ class Puzzle(PiecesManager):
                 left = self.get_piece(i, j - 1)
                 self.pieces[i][j].set_neighbors(up, right, down, left)
 
+        self.pieces_set = set(self.pieces.flatten())
+
+    def correct_solution(self, ps):
+        remaining_set = self.pieces_set - set(ps.pieces.flatten())
+        track_set = set()
+
+        new_pieces = []
+        for piece in ps.pieces.flatten():
+            if piece not in track_set:
+                new_pieces.append(piece)
+            else:
+                new_pieces.append(remaining_set.pop())
+            track_set.add(piece)
+
+        ps.pieces = np.array(new_pieces).reshape(ps.pieces.shape)
+
     def gen_shuffle_pieces(self):
         shuffle = np.copy(self.pieces.flatten())
         np.random.shuffle(shuffle)

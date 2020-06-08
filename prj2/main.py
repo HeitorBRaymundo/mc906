@@ -16,4 +16,4 @@ from utils import plot_image
 
 puzzle = Puzzle('imgs/triforce.png', 3, 4)
 print(puzzle.get_avg_rand_iterations())
-exp_genetic_algorithm(puzzle, 100, max_iterations=10, crossover='crossover2')
+exp_genetic_algorithm(puzzle, 1000, max_iterations=100, crossover='crossover2')
