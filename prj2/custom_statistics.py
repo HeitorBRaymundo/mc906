@@ -13,21 +13,20 @@ class Statistics():
         self.media.append(np.mean([ps.fitness for ps in population]))
 
     def print(self):
-        self.print_min()
-        self.print_max()
-        self.print_media()
-
-    def print_min(self):
-        plt.plot(list(map(lambda x: x.fitness, self.min)))
-        plt.ylabel('min')
+        x_axis = range(0, len(self.min))
+        self.print_min(x_axis)
+        self.print_max(x_axis)
+        self.print_media(x_axis)
+        plt.xlabel('Iterações')
+        plt.ylabel('Metricas')
+        plt.legend()
         plt.show()
 
-    def print_max(self):
-        plt.plot(list(map(lambda x: x.fitness, self.max)))
-        plt.ylabel('max')
-        plt.show()
+    def print_min(self, x_axis):
+        plt.plot(x_axis, list(map(lambda x: x.fitness, self.min)), label = 'min')
 
-    def print_media(self):
-        plt.plot(self.media)
-        plt.ylabel('media')
-        plt.show()
+    def print_max(self, x_axis):
+        plt.plot(x_axis, list(map(lambda x: x.fitness, self.max)), label = 'max')
+
+    def print_media(self, x_axis):
+        plt.plot(x_axis, self.media, label = 'media')

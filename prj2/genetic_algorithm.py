@@ -6,13 +6,13 @@ from proposed_solution import ProposedSolution
 from selection import roulette_selection, tournament_selection
 from crossover import crossover1, crossover2, crossover3
 from mutation import mutation1, mutation2
-from replacement import elitism, steady_state
+from replacement import elitism, steady_state, extermination
 from utils import plot_image, Timer
 from custom_statistics import Statistics
 
 
 def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
-                          selection='roulette', mutation='mutation1', replace='replace_elitism',
+                          selection='roulette', mutation='mutation1', replace='elitism',
                           crossover='crossover1', report_time=3):
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, mutation_rate=mutation_rate, fitness=fitness,
                           selection=selection, crossover=crossover, mutation=mutation, replace=replace)
@@ -91,13 +91,16 @@ class GeneticAlgorithm:
         '''
         retorna proxima geracao
         '''
-        return getattr(self, '_{}'.format(self.replace))(next_gen)
+        return getattr(self, '_replace_{}'.format(self.replace))(next_gen)
 
     def _replace_elitism(self, new_population):
         return elitism(self.get_best(), new_population)
 
     def _replace_steady_state(self, new_population):
         return steady_state(self.population, new_population, steady_rate=self.replacement_rate)
+
+    def _replace_extermination(self, new_population):
+        return extermination(self.population, new_population)
 
     def _mutation(self, population):
         '''
