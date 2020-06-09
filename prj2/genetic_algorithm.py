@@ -12,10 +12,10 @@ from custom_statistics import Statistics
 
 
 def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
-                          selection='roulette', mutation='mutation1', replace='elitism',
+                          selection='roulette', mutation='mutation1', swapness=(10, 30), replace='elitism',
                           crossover='random_split', report_time=3):
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, mutation_rate=mutation_rate, fitness=fitness,
-                          selection=selection, crossover=crossover, mutation=mutation, replace=replace)
+                          selection=selection, crossover=crossover, mutation=mutation, swapness=swapness, replace=replace)
 
     timer = Timer(report_time)
     # plota melhor individuo
@@ -35,7 +35,7 @@ def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10,
 
 class GeneticAlgorithm:
 
-    def __init__(self, puzzle, size, mutation_rate, fitness, selection, crossover, mutation, replace):
+    def __init__(self, puzzle, size, mutation_rate, fitness, selection, crossover, mutation, swapness, replace):
         self.puzzle = puzzle
         self.population = []
         self.mutation_rate = mutation_rate
@@ -43,6 +43,7 @@ class GeneticAlgorithm:
         self.selection = selection
         self.replace = replace
         self.mutation = mutation
+        self.swapness = swapness
         self.crossover = crossover
         self.size = size
         self.statistics = Statistics()
@@ -51,9 +52,7 @@ class GeneticAlgorithm:
         self.pieces_set = set(puzzle.pieces.flatten())
 
         # inicializa populacao de forma randomica
-        for i in range(size):
-            ps = ProposedSolution(puzzle.gen_shuffle_pieces())
-            self.population.append(ps)
+        self.population = [ProposedSolution(puzzle.gen_shuffle_pieces()) for _ in range(size)]
 
         # computa o valor de fitness para cada objeto dentro de population
         self._eval_fitness(self.population)
@@ -110,7 +109,7 @@ class GeneticAlgorithm:
         for proposed_solution in population:
             check_rate = random.randint(0, 100)
             if check_rate <= self.mutation_rate:
-                getattr(mutation, '{}'.format(self.mutation))(proposed_solution)
+                getattr(mutation, 'mutation_{}'.format(self.mutation))(proposed_solution)
         return population
 
     def _crossover(self, parent1, parent2):

@@ -41,11 +41,11 @@ def crossover_best_row(parent1, parent2):
 
     if parent1_best_row == parent2_best_row:
         # Quando a melhor linha dos dois pais forem a mesma, vamos escolher a melhor entre elas
-        selectedRow = parent1.pieces[parent1_best_row] \
+        selected_row = parent1.pieces[parent1_best_row] \
             if parent1.fitness_row[parent1_best_row] < parent2.fitness_row[parent2_best_row] \
             else parent2.pieces[parent2_best_row]
 
-        pieces_child[parent1_best_row] = selectedRow
+        pieces_child[parent1_best_row] = selected_row
 
         return [ProposedSolution(pieces_child)]
     else:
