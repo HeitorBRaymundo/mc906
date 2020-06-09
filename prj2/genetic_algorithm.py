@@ -4,7 +4,7 @@ import time
 from proposed_solution import ProposedSolution
 
 from selection import roulette_selection, tournament_selection
-from crossover import crossover1, crossover2, crossover3
+from crossover import crossover1, crossover2, crossover21, crossover22, crossover3
 from mutation import mutation1, mutation2
 from replacement import elitism, steady_state, extermination
 from utils import plot_image, Timer
@@ -129,7 +129,11 @@ class GeneticAlgorithm:
         return crossover1(parent1, parent2)
 
     def _crossover2(self, parent1, parent2):
-        return crossover2(parent1, parent2)
+        child1, child2 = crossover22(parent1, parent2)
+        # child2 = crossover2(parent1, parent2)
+        self.puzzle.correct_solution(child1)
+        self.puzzle.correct_solution(child2)
+        return child1, child2
 
     def _crossover3(self, parent1, parent2):
         child1, child2 = crossover3(parent1, parent2)
