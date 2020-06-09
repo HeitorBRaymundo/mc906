@@ -9,7 +9,7 @@ puzzle = Puzzle('imgs/star-wars.jpg', 6, 6)
 #puzzle = Puzzle('imgs/triforce.png', 3, 4)
 
 print(puzzle.get_avg_rand_iterations())
-exp_genetic_algorithm(puzzle, 1000, max_iterations=1000, crossover='crossover3')
+exp_genetic_algorithm(puzzle, 1000, max_iterations=1000, crossover='alternate_pieces')
 
 
 

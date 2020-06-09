@@ -4,8 +4,8 @@ import time
 from proposed_solution import ProposedSolution
 
 from selection import roulette_selection, tournament_selection
-from crossover import crossover1, crossover2, crossover21, crossover22, crossover3
-from mutation import mutation1, mutation2
+import crossover
+import mutation
 from replacement import elitism, steady_state, extermination
 from utils import plot_image, Timer
 from custom_statistics import Statistics
@@ -13,7 +13,7 @@ from custom_statistics import Statistics
 
 def exp_genetic_algorithm(puzzle, pop_size, mutation_rate=10, max_iterations=10, fitness='relative',
                           selection='roulette', mutation='mutation1', replace='elitism',
-                          crossover='crossover1', report_time=3):
+                          crossover='random_split', report_time=3):
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, mutation_rate=mutation_rate, fitness=fitness,
                           selection=selection, crossover=crossover, mutation=mutation, replace=replace)
 
@@ -107,39 +107,20 @@ class GeneticAlgorithm:
         faz mutacao considerando self.mutation_rate
         '''
         # chamar metodo de mutação selecionado por self.mutation:
-        for indv in population:
-            checkRate = random.randint(0, 100)
-            if checkRate <= self.mutation_rate:
-                getattr(self, '_{}'.format(self.mutation))(indv)
+        for proposed_solution in population:
+            check_rate = random.randint(0, 100)
+            if check_rate <= self.mutation_rate:
+                getattr(mutation, '{}'.format(self.mutation))(proposed_solution)
         return population
-
-    def _mutation1(self, indv):
-        mutation1(indv)
-
-    def _mutation2(self, indv):
-        mutation2(indv)
 
     def _crossover(self, parent1, parent2):
         '''
         faz crossover entre duas proposed solutions
         '''
-        return getattr(self, '_{}'.format(self.crossover))(parent1, parent2)
-
-    def _crossover1(self, parent1, parent2):
-        return crossover1(parent1, parent2)
-
-    def _crossover2(self, parent1, parent2):
-        child1, child2 = crossover22(parent1, parent2)
-        # child2 = crossover2(parent1, parent2)
-        self.puzzle.correct_solution(child1)
-        self.puzzle.correct_solution(child2)
-        return child1, child2
-
-    def _crossover3(self, parent1, parent2):
-        child1, child2 = crossover3(parent1, parent2)
-        self.puzzle.correct_solution(child1)
-        self.puzzle.correct_solution(child2)
-        return child1, child2
+        child_list = getattr(crossover, 'crossover_{}'.format(self.crossover))(parent1, parent2)
+        for child in child_list:
+            self.puzzle.correct_solution(child)
+        return child_list
 
     def _update_statistics(self):
         '''
@@ -165,8 +146,8 @@ class GeneticAlgorithm:
         for i in range(1, len(selected_parents), 2):
             parent1 = selected_parents[i - 1]
             parent2 = selected_parents[i]
-            child1, child2 = self._crossover(parent1, parent2)
-            next_gen.extend([child1, child2])
+            child_list = self._crossover(parent1, parent2)
+            next_gen.extend(child_list)
 
             # child1 = self._crossover(parent1, parent2)
             # next_gen.extend([child1])

@@ -3,110 +3,81 @@ import numpy as np
 
 from proposed_solution import ProposedSolution
 
-def crossover1(parent1, parent2):
-    raise NotImplementedError()
 
-def crossover2(parent1, parent2):
+def crossover_best_piece_fitness(parent1, parent2):
+    pieces_child = np.array([piece1 if piece1.fitness < piece2.fitness else piece2
+                             for piece1, piece2 in zip(parent1.pieces.flatten(), parent2.pieces.flatten())])
 
-    def getBestRow(ps):
-        
-        bestRow = 0
-        for row in range(0 , len(ps.fitness_row)):
-            if (ps.fitness_row[row] <= ps.fitness_row[bestRow]):
-                bestRow = row
-
-        return bestRow
-
-    parent1BestRow = getBestRow(parent1)
-    parent2BestRow = getBestRow(parent2)
-
-    parent1Fitness = parent1.fitness_relative()
-    parent2Fitness = parent2.fitness_relative()
-    bestParent = parent1 if parent1Fitness < parent2Fitness else parent2
-
-    # O filho terá a maior parte do cromossomo sendo do melhor pai
-    pieces_child1 = np.empty_like(bestParent.pieces)
-
-    sameRow = parent1BestRow == parent2BestRow
-    if (sameRow):
-        # Quando a melhor linha dos dois pais forem a mesma, vamos escolher a melhor entre elas
-        selectedRow = parent1.pieces[parent1BestRow] \
-            if parent1.fitness_row[parent1BestRow] < parent2.fitness_row[parent2BestRow] \
-            else parent2.pieces[parent2BestRow]
-
-        pieces_child1[parent1BestRow] = selectedRow
-
-        for row in range(0, len(pieces_child1)):
-            if (row == parent1BestRow):
-                continue
-            pieces_child1[row] = bestParent.pieces[row]
-
-        return ProposedSolution(pieces_child1)
-    else:
-        # Adicionamos em 2 linhas do filho, as melhores linhas de cada um dos pais
-        pieces_child1[parent1BestRow] = parent1.pieces[parent1BestRow]
-        pieces_child1[parent2BestRow] = parent2.pieces[parent2BestRow]
-
-        for row in range(0, len(pieces_child1)):
-            if (row == parent1BestRow or row == parent2BestRow):
-                continue
-            pieces_child1[row] = bestParent.pieces[row]
-
-        return ProposedSolution(pieces_child1)
-
-def crossover21(parent1, parent2):
-    pieces_child1 = np.empty_like(parent1.pieces)
-    pieces_child2 = np.empty_like(parent2.pieces)
-
-    for row in range(0, len(parent1.pieces)):
-        for col in range(0, len(parent1.pieces[row])):
-            parent1Up = parent1.pieces[row - 1][col] if row - 1 >= 0 else None
-            parent1Right = parent1.pieces[row][col + 1] if col + 1 < len(parent1.pieces[row]) - 1 else None
-            parent1Down = parent1.pieces[row + 1][col] if row + 1 < len(parent1.pieces) - 1 else None
-            parent1Left = parent1.pieces[row][col - 1] if col - 1 >= 0 else None
-            
-            evaluatedParent1Piece = parent1.pieces[row][col].eval_relative(parent1Up, parent1Right, parent1Down, parent1Left)
-
-            parent2Up = parent2.pieces[row - 1][col] if row - 1 >= 0 else None
-            parent2Right = parent2.pieces[row][col + 1] if col + 1 < len(parent1.pieces[row]) - 1 else None
-            parent2Down = parent2.pieces[row + 1][col] if row + 1 < len(parent1.pieces) - 1 else None
-            parent2Left = parent2.pieces[row][col - 1] if col - 1 >= 0 else None
-            
-            evaluatedParent2Piece = parent2.pieces[row][col].eval_relative(parent2Up, parent2Right, parent2Down, parent2Left)
-
-            if (evaluatedParent1Piece < evaluatedParent2Piece):
-                pieces_child1[row][col] = parent1.pieces[row][col]
-                pieces_child2[row][col] = parent1.pieces[row][col]
-            else:
-                pieces_child1[row][col] = parent2.pieces[row][col]
-                pieces_child2[row][col] = parent2.pieces[row][col]
-
-    return ProposedSolution(pieces_child1), ProposedSolution(pieces_child2)
+    return [ProposedSolution(pieces_child.reshape(parent1.pieces.shape))]
 
 
-def crossover22(parent1, parent2):
-    pieces_child1 = np.empty_like(parent1.pieces)
-    pieces_child2 = np.empty_like(parent2.pieces)
-
-    for row in range(0, len(parent1.pieces)):
-        for col in range(0, len(parent1.pieces[row])):
-            if (row % 2 == 0 and col % 2 != 0):
-               pieces_child1[row][col] = parent1.pieces[row][col]
-               pieces_child2[row][col] = parent2.pieces[row][col]
-            else:
-               pieces_child1[row][col] = parent2.pieces[row][col]
-               pieces_child2[row][col] = parent1.pieces[row][col]
-
-    return ProposedSolution(pieces_child1), ProposedSolution(pieces_child2)
-
-def crossover3(parent1, parent2):
+def crossover_random_split(parent1, parent2):
     pieces_child1 = np.empty_like(parent1.pieces)
     pieces_child2 = np.empty_like(parent2.pieces)
 
     if random.randint(0, 1):
+        split_point = random.randint(1, parent1.pieces.shape[0] - 1)
+        pieces_child1[:split_point, :] = parent1.pieces[:split_point, :]
+        pieces_child1[split_point:, :] = parent2.pieces[split_point:, :]
+        pieces_child2[:split_point, :] = parent2.pieces[:split_point, :]
+        pieces_child2[split_point:, :] = parent1.pieces[split_point:, :]
+    else:
+        split_point = random.randint(1, parent1.pieces.shape[1] - 1)
+        pieces_child1[:, :split_point] = parent1.pieces[:, :split_point]
+        pieces_child1[:, split_point:] = parent2.pieces[:, split_point:]
+        pieces_child2[:, :split_point] = parent2.pieces[:, :split_point]
+        pieces_child2[:, split_point:] = parent1.pieces[:, split_point:]
+
+    return [ProposedSolution(pieces_child1), ProposedSolution(pieces_child2)]
 
 
-        """
+def crossover_best_row(parent1, parent2):
+    parent1_best_row = np.argmin(parent1.fitness_row)
+    parent2_best_row = np.argmin(parent2.fitness_row)
+    best_parent = parent1 if parent1.fitness < parent2.fitness else parent2
+
+    # O filho terá a maior parte do cromossomo sendo do melhor pai
+    pieces_child = np.copy(best_parent.pieces)
+
+    if parent1_best_row == parent2_best_row:
+        # Quando a melhor linha dos dois pais forem a mesma, vamos escolher a melhor entre elas
+        selectedRow = parent1.pieces[parent1_best_row] \
+            if parent1.fitness_row[parent1_best_row] < parent2.fitness_row[parent2_best_row] \
+            else parent2.pieces[parent2_best_row]
+
+        pieces_child[parent1_best_row] = selectedRow
+
+        return [ProposedSolution(pieces_child)]
+    else:
+        # Adicionamos em 2 linhas do filho, as melhores linhas de cada um dos pais
+        pieces_child[parent1_best_row] = parent1.pieces[parent1_best_row]
+        pieces_child[parent2_best_row] = parent2.pieces[parent2_best_row]
+
+        return [ProposedSolution(pieces_child)]
+
+
+def crossover_alternate_pieces(parent1, parent2):
+    pieces_child1 = np.empty_like(parent1.pieces)
+    pieces_child2 = np.empty_like(parent2.pieces)
+
+    for row in range(0, len(parent1.pieces)):
+        for col in range(0, len(parent1.pieces[row])):
+            if row % 2 == 0 and col % 2 != 0:
+                pieces_child1[row][col] = parent1.pieces[row][col]
+                pieces_child2[row][col] = parent2.pieces[row][col]
+            else:
+                pieces_child1[row][col] = parent2.pieces[row][col]
+                pieces_child2[row][col] = parent1.pieces[row][col]
+
+    return ProposedSolution(pieces_child1), ProposedSolution(pieces_child2)
+
+
+"""
+def crossover_best_split(parent1, parent2):
+    pieces_child1 = np.empty_like(parent1.pieces)
+    pieces_child2 = np.empty_like(parent2.pieces)
+
+    if random.randint(0, 1):
         agg_sum_parent1 = [0]
         for i, fitness in enumerate(parent1.fitness_row):
             agg_sum_parent1.append(agg_sum_parent1[i - 1] + fitness)
@@ -116,21 +87,13 @@ def crossover3(parent1, parent2):
             agg_sum_parent2.append(agg_sum_parent2[i - 1] + fitness)
         
         split_point = np.argmin(list(map(np.add, agg_sum_parent1, agg_sum_parent2))[1:])
-        """
-
-        split_point = random.randint(1, parent1.pieces.shape[0]-1)
 
         pieces_child1[:split_point, :] = parent1.pieces[:split_point, :]
         pieces_child1[split_point:, :] = parent2.pieces[split_point:, :]
 
         pieces_child2[:split_point, :] = parent2.pieces[:split_point, :]
         pieces_child2[split_point:, :] = parent1.pieces[split_point:, :]
-
-        #print(split_point)
-
     else:
-
-        """
         agg_sum_parent1 = [0]
         for i, fitness in enumerate(parent1.fitness_column):
             agg_sum_parent1.append(agg_sum_parent1[i - 1] + fitness)
@@ -140,8 +103,6 @@ def crossover3(parent1, parent2):
             agg_sum_parent2.append(agg_sum_parent2[i - 1] + fitness)
             
         split_point = np.argmin(list(map(np.add, agg_sum_parent1, agg_sum_parent2))[1:])
-        """
-        split_point = random.randint(1, parent1.pieces.shape[1]-1)
 
         pieces_child1[:, :split_point] = parent1.pieces[:, :split_point]
         pieces_child1[:, split_point:] = parent2.pieces[:, split_point:]
@@ -149,7 +110,5 @@ def crossover3(parent1, parent2):
         pieces_child2[:, :split_point] = parent2.pieces[:, :split_point]
         pieces_child2[:, split_point:] = parent1.pieces[:, split_point:]
 
-        #print(split_point)
-
-
     return ProposedSolution(pieces_child1), ProposedSolution(pieces_child2)
+"""
