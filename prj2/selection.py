@@ -22,11 +22,10 @@ def roulette_selection(population, selection_count):
     return result_population
 
 
-def tournament_selection(population, selection_count):
+def tournament_selection(population, selection_count, tournament_size):
     if len(population) == 0 or selection_count == 0:
         return []
 
-    tournament_size = round(len(population) / 10)
     result_population = []
 
     for i in range(0, selection_count):

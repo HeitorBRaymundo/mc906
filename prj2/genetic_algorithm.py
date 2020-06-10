@@ -34,7 +34,7 @@ def exp_genetic_algorithm(puzzle, pop_size, fitness='relative', selection='roule
 class GeneticAlgorithm:
 
     def __init__(self, puzzle, size, fitness, selection, crossover, mutation, replace,
-                 selection_count=None, mutation_rate=10, mutation_swapness=(10, 30), replacement_rate=0.1):
+                 selection_count=None, selection_tournament_size=None, mutation_rate=10, mutation_swapness=(10, 30), replacement_rate=0.1):
 
         self.puzzle = puzzle
         self.population = []
@@ -48,6 +48,10 @@ class GeneticAlgorithm:
             self.selection_count = round(size / 2)
         else:
             self.selection_count = selection_count
+        if selection_tournament_size is None:
+            self.selection_tournament_size = round(size / 2)
+        else:
+            self.selection_tournament_size = selection_tournament_size
         self.mutation_rate = mutation_rate
         self.mutation_swapness = mutation_swapness
         self.replacement_rate = replacement_rate
@@ -87,7 +91,7 @@ class GeneticAlgorithm:
         return roulette_selection(self.population, self.selection_count)
 
     def _selection_tournament(self):
-        return tournament_selection(self.population, self.selection_count)
+        return tournament_selection(self.population, self.selection_count, self.selection_tournament_size)
 
     def _crossover(self, parent1, parent2):
         '''
