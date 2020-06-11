@@ -1,11 +1,13 @@
 import random
 import numpy as np
 
+
 def mutation_swap_lines_columns(ps):
     if random.randint(0, 1):
         _mutation_swap_lines(ps)
     else:
         _mutation_swap_columns(ps)
+
 
 def mutation_swap_pieces(ps, swapness=(10, 30)):
     # Swap: swapping n cells, where n is a number calculated giving the size of the puzzle and a random rate
@@ -33,6 +35,7 @@ def mutation_swap_pieces(ps, swapness=(10, 30)):
         ps.pieces[rand_to_row][rand_to_col] = from_cel
         ps.pieces[rand_from_row][rand_from_col] = to_cel
 
+
 def _mutation_swap_lines(ps):
     # Swap sequence: swapping lines
     swap_from_row = random.randint(0, ps.pieces.shape[0] - 1)
@@ -47,6 +50,7 @@ def _mutation_swap_lines(ps):
     ps.pieces[swap_to_row, :] = from_row
     ps.pieces[swap_from_row, :] = to_row
 
+
 def _mutation_swap_columns(ps):
     # Swap sequence: swapping lines
     swap_from_column = random.randint(0, ps.pieces.shape[1] - 1)
@@ -60,5 +64,3 @@ def _mutation_swap_columns(ps):
 
     ps.pieces[:, swap_to_column] = from_column
     ps.pieces[:, swap_from_column] = to_column
-
-

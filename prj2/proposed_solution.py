@@ -49,4 +49,4 @@ class ProposedSolution(PiecesManager):
         return self.fitness < other.fitness
 
     def __repr__(self):
-        return self.fitness
+        return str(self.fitness)

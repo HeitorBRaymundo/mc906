@@ -1,3 +1,6 @@
+import random
+import numpy as np
+
 
 from genetic_algorithm import exp_genetic_algorithm
 from puzzle import Puzzle
@@ -5,11 +8,17 @@ import math
 
 #%%
 
+np.random.seed(42)
+
+random.seed(42)
+
+
+
 puzzle = Puzzle('imgs/star-wars.jpg', 6, 6)
 #puzzle = Puzzle('imgs/triforce.png', 3, 4)
 
 print(puzzle.get_avg_rand_iterations())
-exp_genetic_algorithm(puzzle, 1000, max_iterations=100000, mutation='swap_pieces', crossover='random_split')
+exp_genetic_algorithm(puzzle, 1000, max_iterations=1000, mutation='swap_pieces', crossover='random_split')
 
 
 

@@ -1,5 +1,4 @@
 import random
-import time
 
 from proposed_solution import ProposedSolution
 
@@ -15,7 +14,6 @@ from custom_statistics import Statistics
 def exp_genetic_algorithm(puzzle, pop_size, fitness='relative', selection='roulette', crossover='random_split',
                           mutation='swap_pieces', replace='elitism', selection_count=None, mutation_rate=10,
                           mutation_swapness=(10, 30), replacement_rate=0.1, max_iterations=10, report_time=3):
-
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, fitness=fitness, selection=selection, crossover=crossover,
                           mutation=mutation, replace=replace, selection_count=selection_count,
                           mutation_rate=mutation_rate, mutation_swapness=mutation_swapness,
@@ -31,10 +29,12 @@ def exp_genetic_algorithm(puzzle, pop_size, fitness='relative', selection='roule
     plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
     ga.statistics.print()
 
+
 class GeneticAlgorithm:
 
     def __init__(self, puzzle, size, fitness, selection, crossover, mutation, replace,
-                 selection_count=None, selection_tournament_size=None, mutation_rate=10, mutation_swapness=(10, 30), replacement_rate=0.1):
+                 selection_count=None, selection_tournament_size=None, mutation_rate=10, mutation_swapness=(10, 30),
+                 replacement_rate=0.1):
 
         self.puzzle = puzzle
         self.population = []
@@ -64,6 +64,7 @@ class GeneticAlgorithm:
 
         # computa o valor de fitness para cada objeto dentro de population
         self._eval_fitness(self.population)
+        self.sort_population()
         self.population.sort()
         self.iterations = 0
 
@@ -144,7 +145,7 @@ class GeneticAlgorithm:
         '''
         retorna proxima geracao
         '''
-        return getattr(self, '_replace_{}'.format(self.replace))(next_gen)
+        return getattr(self, '_replace_{}'.format(self.replace))(next_gen)[:self.size]
 
     def _replace_elitism(self, new_population):
         return elitism(self.get_best(), new_population)
@@ -191,6 +192,7 @@ class GeneticAlgorithm:
 
         # substitui pela proxima geracao
         self.population = self._replace(next_gen)
+        self.sort_population()
 
         self._update_statistics()
         self.iterations += 1
