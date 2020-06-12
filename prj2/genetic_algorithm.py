@@ -1,6 +1,7 @@
 import random
 
 from proposed_solution import ProposedSolution
+from puzzle import Puzzle
 
 from selection import roulette_selection, tournament_selection
 from crossover import crossover_best_piece_fitness, crossover_random_split, crossover_best_row, \
@@ -9,19 +10,29 @@ from mutation import mutation_swap_pieces, mutation_swap_lines_columns
 from replacement import elitism, steady_state, extermination
 from utils import plot_image, Timer, Animation
 from custom_statistics import Statistics
+import numpy as np
 
 
-def exp_genetic_algorithm(puzzle, pop_size, fitness='relative', selection='roulette', crossover='random_split',
-                          mutation='swap_pieces', replace='elitism', selection_count=None, mutation_rate=10,
-                          mutation_swapness=(10, 30), replacement_rate=0.1, max_iterations=10, report_time=1):
+def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, fitness='relative', selection='roulette',
+                          crossover='random_split', mutation='swap_pieces', replace='elitism', selection_count=None,
+                          selection_tournament_size=None, crossover_rate=100, mutation_rate=10,
+                          mutation_swapness=(10, 30), replacement_rate=0.1,
+                          max_iterations=10, report_time=1):
+    np.random.seed(42)
+    random.seed(42)
+
+    puzzle = Puzzle(puzzle_file, puzzle_splits[0], puzzle_splits[1])
+
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, fitness=fitness, selection=selection, crossover=crossover,
                           mutation=mutation, replace=replace, selection_count=selection_count,
-                          mutation_rate=mutation_rate, mutation_swapness=mutation_swapness,
+                          selection_tournament_size=selection_tournament_size, mutation_rate=mutation_rate,
+                          crossover_rate=crossover_rate, mutation_swapness=mutation_swapness,
                           replacement_rate=replacement_rate)
 
     print("Número de combinações possíveis: {}".format(puzzle.get_avg_rand_iterations()))
 
     timer = Timer(report_time)
+    timer_algorithm = Timer()
     animation = Animation()
 
     while ga.iterations < max_iterations and not ga.stop_criteria():
@@ -30,6 +41,8 @@ def exp_genetic_algorithm(puzzle, pop_size, fitness='relative', selection='roule
             print('Iteração atual {}: {}\r'.format(ga.iterations, ga.statistics.get_last()), end="")
         animation.append_new_frame(ga.get_best().get_image(), "Melhor indivíduo iteração {}".format(ga.iterations))
 
+    print()
+    print("Tempo de execução: {}s".format(timer_algorithm.get_past()))
     plot_image(ga.get_best().get_image_grid(), figsize=(16, 9), titles=["Melhor indivíduo final"], fontsize=24)
     ga.statistics.plot()
     print("Generating video... ")
@@ -40,8 +53,8 @@ def exp_genetic_algorithm(puzzle, pop_size, fitness='relative', selection='roule
 class GeneticAlgorithm:
 
     def __init__(self, puzzle, size, fitness, selection, crossover, mutation, replace,
-                 selection_count=None, selection_tournament_size=None, mutation_rate=10, mutation_swapness=(10, 30),
-                 replacement_rate=0.1):
+                 selection_count, selection_tournament_size, crossover_rate, mutation_rate,
+                 mutation_swapness, replacement_rate):
 
         self.puzzle = puzzle
         self.population = []
@@ -59,6 +72,7 @@ class GeneticAlgorithm:
             self.selection_tournament_size = round(size / 2)
         else:
             self.selection_tournament_size = selection_tournament_size
+        self.crossover_rate = crossover_rate
         self.mutation_rate = mutation_rate
         self.mutation_swapness = mutation_swapness
         self.replacement_rate = replacement_rate
@@ -100,11 +114,21 @@ class GeneticAlgorithm:
     def _selection_tournament(self):
         return tournament_selection(self.population, self.selection_count, self.selection_tournament_size)
 
-    def _crossover(self, parent1, parent2):
+    def _crossover(self, selected_parents):
         '''
-        faz crossover entre duas proposed solutions
+        faz crossover nos selected_parents
         '''
-        return getattr(self, '_crossover_{}'.format(self.crossover))(parent1, parent2)
+
+        next_gen = []
+        for i in range(1, len(selected_parents), 2):
+            check_rate = random.randint(0, 100)
+            if check_rate <= self.mutation_rate:
+                parent1 = selected_parents[i - 1]
+                parent2 = selected_parents[i]
+                child_list = getattr(self, '_crossover_{}'.format(self.crossover))(parent1, parent2)
+                next_gen.extend(child_list)
+
+        return next_gen
 
     def _crossover_best_piece_fitness(self, parent1, parent2):
         child_list = crossover_best_piece_fitness(parent1, parent2)
@@ -181,13 +205,8 @@ class GeneticAlgorithm:
         # seleciona candidatos a pais (ordenados)
         selected_parents = self._selection()
 
-        # crossover entre dois individuos
-        next_gen = []
-        for i in range(1, len(selected_parents), 2):
-            parent1 = selected_parents[i - 1]
-            parent2 = selected_parents[i]
-            child_list = self._crossover(parent1, parent2)
-            next_gen.extend(child_list)
+        # crossover
+        next_gen = self._crossover(selected_parents)
 
         self._complete_next_gen_with_clones(next_gen)
 
@@ -202,4 +221,3 @@ class GeneticAlgorithm:
 
         self._update_statistics()
         self.iterations += 1
-

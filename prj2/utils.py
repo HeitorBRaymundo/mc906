@@ -75,7 +75,7 @@ class Animation:
 
 class Timer:
 
-    def __init__(self, time_passed):
+    def __init__(self, time_passed=None):
         self._start = None
         self.time_passed = time_passed
         self.start()
@@ -83,8 +83,11 @@ class Timer:
     def start(self):
         self._start = time.time()
 
+    def get_past(self):
+        return time.time() - self._start
+
     def check(self):
-        if (time.time() - self._start) > self.time_passed:
+        if self.time_passed is not None and(time.time() - self._start) > self.time_passed:
             self.start()
             return True
         return False
