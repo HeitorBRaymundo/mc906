@@ -7,27 +7,34 @@ from crossover import crossover_best_piece_fitness, crossover_random_split, cros
     crossover_alternate_pieces
 from mutation import mutation_swap_pieces, mutation_swap_lines_columns
 from replacement import elitism, steady_state, extermination
-from utils import plot_image, Timer
+from utils import plot_image, Timer, Animation
 from custom_statistics import Statistics
 
 
 def exp_genetic_algorithm(puzzle, pop_size, fitness='relative', selection='roulette', crossover='random_split',
                           mutation='swap_pieces', replace='elitism', selection_count=None, mutation_rate=10,
-                          mutation_swapness=(10, 30), replacement_rate=0.1, max_iterations=10, report_time=3):
+                          mutation_swapness=(10, 30), replacement_rate=0.1, max_iterations=10, report_time=1):
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, fitness=fitness, selection=selection, crossover=crossover,
                           mutation=mutation, replace=replace, selection_count=selection_count,
                           mutation_rate=mutation_rate, mutation_swapness=mutation_swapness,
                           replacement_rate=replacement_rate)
 
+    print("Número de combinações possíveis: {}".format(puzzle.get_avg_rand_iterations()))
+
     timer = Timer(report_time)
+    animation = Animation()
 
     while ga.iterations < max_iterations and not ga.stop_criteria():
         ga.iterate()
         if timer.check():
-            ga.statistics.print()
+            print('Iteração atual {}: {}\r'.format(ga.iterations, ga.statistics.get_last()), end="")
+        animation.append_new_frame(ga.get_best().get_image(), "Melhor indivíduo iteração {}".format(ga.iterations))
 
-    plot_image(ga.get_best().get_image_grid(), figsize=(7, 7))
-    ga.statistics.print()
+    plot_image(ga.get_best().get_image_grid(), figsize=(16, 9), titles=["Melhor indivíduo final"], fontsize=24)
+    ga.statistics.plot()
+    print("Generating video... ")
+    animation.show_video()
+    print("Finished")
 
 
 class GeneticAlgorithm:
@@ -65,7 +72,6 @@ class GeneticAlgorithm:
         # computa o valor de fitness para cada objeto dentro de population
         self._eval_fitness(self.population)
         self.sort_population()
-        self.population.sort()
         self.iterations = 0
 
     def _eval_fitness(self, population):
@@ -197,5 +203,3 @@ class GeneticAlgorithm:
         self._update_statistics()
         self.iterations += 1
 
-    def __str__(self):
-        return self.__dict__.__str__()

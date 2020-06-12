@@ -14,7 +14,7 @@ random.seed(42)
 
 
 
-puzzle = Puzzle('imgs/star-wars.jpg', 6, 6)
+puzzle = Puzzle('imgs/star-wars.jpg', 5, 5)
 #puzzle = Puzzle('imgs/triforce.png', 3, 4)
 
 print(puzzle.get_avg_rand_iterations())

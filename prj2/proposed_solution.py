@@ -40,7 +40,7 @@ class ProposedSolution(PiecesManager):
         return self.fitness
 
     def clone(self):
-        return ProposedSolution(self.pieces)
+        return ProposedSolution(np.copy(self.pieces))
 
     def __eq__(self, other):
         return self.fitness == other.fitness and self.fitness == other.fitness

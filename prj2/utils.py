@@ -1,6 +1,12 @@
 import time
 
 import matplotlib.pyplot as plt
+from matplotlib import animation, rc
+import numpy as np
+
+from IPython.core.display import display, HTML
+
+
 
 def plot_image(*images, titles=[], table_format=(1, 0), figsize=(15, 15), axis=False, fontsize=20):
     '''
@@ -24,11 +30,48 @@ def plot_image(*images, titles=[], table_format=(1, 0), figsize=(15, 15), axis=F
         ax.imshow(image)
     plt.show()
 
-def animate(*images, delay):
-    raise NotImplementedError()
 
-def plot_evolution_graph(*metrics):
-    raise NotImplementedError()
+class Animation:
+    def __init__(self):
+        self.frames = []
+        self.labels = []
+        self.fig = None
+        self.ax = None
+        self.im = None
+
+    def _animate(self, i):
+        self.ax.set_xlabel(self.labels[i], fontsize=24)
+        self.im.set_array(self.frames[i])
+        return [self.im]
+
+    def append_new_frame(self, new_frame, label):
+        if len(self.frames) == 0 or not (self.frames[-1] == new_frame).all():
+            self.frames.append(new_frame)
+            self.labels.append(label)
+
+    def _duplicate_last_frames(self):
+        self.frames.extend([self.frames[-1]] * 10)
+        self.labels.extend([self.labels[-1]] * 10)
+
+    def _remove_last_frames(self):
+        self.frames = self.frames[:-10]
+        self.labels = self.labels[:-10]
+
+    def show_video(self):
+        self.fig, self.ax = plt.subplots(figsize=(12, 7))
+        self.ax.set_yticklabels([])
+        self.ax.set_xticklabels([])
+        self.ax.xaxis.set_ticks_position('none')
+        self.ax.yaxis.set_ticks_position('none')
+        self.ax.set_xlabel('teste {}'.format(0))
+        self.im = self.ax.imshow(self.frames[0], interpolation='none')
+        self._duplicate_last_frames()
+        anim = animation.FuncAnimation(self.fig, self._animate, frames=len(self.frames), interval=500, blit=True)
+        plt.close()
+        display(HTML(anim.to_html5_video()))
+        self._remove_last_frames()
+
+
 
 class Timer:
 

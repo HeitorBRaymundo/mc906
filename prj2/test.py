@@ -9,4 +9,19 @@ import numpy as np
 from config import Config
 
 
-print([1, 2].pop())
+puzzle = Puzzle('imgs/triforce.png', 2, 2)
+ps1 = ProposedSolution(puzzle.gen_shuffle_pieces())
+
+plot_image(ps1.get_image())
+ps1.fitness_relative()
+print(ps1.fitness_matrix)
+
+mutation.mutation_swap_pieces(ps1)
+
+ps1.fitness_relative()
+print(ps1.fitness_matrix)
+
+plot_image(ps1.get_image())
+
+
+
