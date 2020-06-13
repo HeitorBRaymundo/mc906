@@ -1,4 +1,6 @@
 import math
+from collections import defaultdict
+
 from PIL import Image
 import numpy as np
 from piece import PiecesManager, Piece
@@ -52,7 +54,7 @@ class Puzzle(PiecesManager):
         self.pieces_set = list(self.pieces.flatten())
         np.random.shuffle(self.pieces_set)
 
-    def correct_solution(self, ps):
+    def correct_solution2(self, ps):
         ps_pieces_list = list(ps.pieces.flatten())
         remaining_set = [item for item in self.pieces_set if item not in ps_pieces_list]
         track_set = set()
@@ -67,6 +69,25 @@ class Puzzle(PiecesManager):
             track_set.add(piece)
 
         ps.pieces = np.array(new_pieces).reshape(ps.pieces.shape)
+
+    def correct_solution(self, ps):
+        ps_pieces_list = list(ps.pieces.flatten())
+        remaining_set = [item for item in self.pieces_set if item not in ps_pieces_list]
+        ps.fitness_relative()
+
+        pieces_dict = defaultdict(list)
+        fitness_flatten = ps.fitness_matrix.flatten()
+        for i, piece in enumerate(ps.pieces.flatten()):
+            pieces_dict[piece].append({"index": i, "fitness": fitness_flatten[i]})
+
+        new_pieces = ps.pieces.flatten()
+        for key, value in pieces_dict.items():
+            ordered_fitness = sorted(value, key=lambda k: k['fitness'])
+            for i in range(1, len(ordered_fitness)):
+                new_pieces[ordered_fitness[i]['index']] = remaining_set[0]
+                del remaining_set[0]
+
+        ps.pieces = new_pieces.reshape(ps.pieces.shape)
 
     def gen_shuffle_pieces(self):
         shuffle = np.copy(self.pieces.flatten())

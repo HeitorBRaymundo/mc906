@@ -16,7 +16,7 @@ class ProposedSolution(PiecesManager):
         """
         Conta o numero de peças na posição incorreta
         """
-        self.fitness_matrix = np.array([[(1 - self.pieces[i][j].eval_absolute(j, i))
+        self.fitness_matrix = np.array([[(self.pieces[i][j].eval_absolute(j, i))
                                          for j in range(self.pieces.shape[1])] for i in range(self.pieces.shape[0])])
 
         return self._complete_fitness()
@@ -25,10 +25,10 @@ class ProposedSolution(PiecesManager):
         """
         Conta o numero total de vizinhos errados
         """
-        self.fitness_matrix = np.array([[(4 - self.pieces[i][j].eval_relative(self.get_piece(i - 1, j),
-                                                                              self.get_piece(i, j + 1),
-                                                                              self.get_piece(i + 1, j),
-                                                                              self.get_piece(i, j - 1)))
+        self.fitness_matrix = np.array([[self.pieces[i][j].eval_relative(self.get_piece(i - 1, j),
+                                                                         self.get_piece(i, j + 1),
+                                                                         self.get_piece(i + 1, j),
+                                                                         self.get_piece(i, j - 1))
                                          for j in range(self.pieces.shape[1])] for i in range(self.pieces.shape[0])])
 
         return self._complete_fitness()
@@ -40,7 +40,11 @@ class ProposedSolution(PiecesManager):
         return self.fitness
 
     def clone(self):
-        return ProposedSolution(np.copy(self.pieces))
+        ps = ProposedSolution(np.copy(self.pieces))
+        ps.fitness_matrix = np.copy(self.fitness_matrix)
+        ps.fitness_row = np.copy(self.fitness_row)
+        ps.fitness_column = np.copy(self.fitness_column)
+        return ps
 
     def __eq__(self, other):
         return self.fitness == other.fitness and self.fitness == other.fitness

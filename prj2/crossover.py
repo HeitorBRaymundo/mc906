@@ -5,8 +5,12 @@ from proposed_solution import ProposedSolution
 
 
 def crossover_best_piece_fitness(parent1, parent2):
-    pieces_child = np.array([piece1 if piece1.fitness < piece2.fitness else piece2
-                             for piece1, piece2 in zip(parent1.pieces.flatten(), parent2.pieces.flatten())])
+    fitness_flatten1 = parent1.fitness_matrix.flatten()
+    fitness_flatten2 = parent1.fitness_matrix.flatten()
+
+    pieces_child = np.array([piece1 if fitness_flatten1[i] < fitness_flatten2[i] else piece2
+                             for i, (piece1, piece2) in
+                             enumerate(zip(parent1.pieces.flatten(), parent2.pieces.flatten()))])
 
     return [ProposedSolution(pieces_child.reshape(parent1.pieces.shape))]
 
@@ -23,6 +27,35 @@ def crossover_random_split(parent1, parent2):
         pieces_child2[split_point:, :] = parent1.pieces[split_point:, :]
     else:
         split_point = random.randint(1, parent1.pieces.shape[1] - 1)
+        pieces_child1[:, :split_point] = parent1.pieces[:, :split_point]
+        pieces_child1[:, split_point:] = parent2.pieces[:, split_point:]
+        pieces_child2[:, :split_point] = parent2.pieces[:, :split_point]
+        pieces_child2[:, split_point:] = parent1.pieces[:, split_point:]
+
+    return [ProposedSolution(pieces_child1), ProposedSolution(pieces_child2)]
+
+
+def crossover_max_random_split(parent1, parent2):
+    pieces_child1 = np.empty_like(parent1.pieces)
+    pieces_child2 = np.empty_like(parent2.pieces)
+
+    def __search_agg_fitness(agg_fitness, drawn_value):
+        for i in range(1, len(agg_fitness)):
+            if (agg_fitness[i] >= drawn_value):
+                return i
+
+    if random.randint(0, 1):
+        aggregated_fitness = np.cumsum(np.max(parent1.fitness_matrix, axis=1))
+        drawn_value = random.randint(aggregated_fitness[0], aggregated_fitness[-1]-1)
+        split_point = __search_agg_fitness(aggregated_fitness, drawn_value)
+        pieces_child1[:split_point, :] = parent1.pieces[:split_point, :]
+        pieces_child1[split_point:, :] = parent2.pieces[split_point:, :]
+        pieces_child2[:split_point, :] = parent2.pieces[:split_point, :]
+        pieces_child2[split_point:, :] = parent1.pieces[split_point:, :]
+    else:
+        aggregated_fitness = np.cumsum(np.max(parent1.fitness_matrix, axis=0))
+        drawn_value = random.randint(aggregated_fitness[0], aggregated_fitness[-1]-1)
+        split_point = __search_agg_fitness(aggregated_fitness, drawn_value)
         pieces_child1[:, :split_point] = parent1.pieces[:, :split_point]
         pieces_child1[:, split_point:] = parent2.pieces[:, split_point:]
         pieces_child2[:, :split_point] = parent2.pieces[:, :split_point]

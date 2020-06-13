@@ -9,19 +9,29 @@ import numpy as np
 from config import Config
 
 
+"""
 puzzle = Puzzle('imgs/triforce.png', 2, 2)
 ps1 = ProposedSolution(puzzle.gen_shuffle_pieces())
+ps2 = ProposedSolution(puzzle.gen_shuffle_pieces())
 
-plot_image(ps1.get_image())
+child = crossover.crossover_random_split(ps1, ps2)[0]
+
+plot_image(child.get_image())
+puzzle.correct_solution(child)
+plot_image(child.get_image())
+
+"""
+
+puzzle = Puzzle('imgs/star-wars.jpg', 3, 3)
+ps1 = ProposedSolution(puzzle.pieces)
+copy = puzzle.pieces[0][0]
+puzzle.pieces[0][0] = puzzle.pieces[1][1]
+puzzle.pieces[1][1] = copy
 ps1.fitness_relative()
-print(ps1.fitness_matrix)
-
-mutation.mutation_swap_pieces(ps1)
-
-ps1.fitness_relative()
-print(ps1.fitness_matrix)
-
 plot_image(ps1.get_image())
+mutation._mutation_swap_pieces(ps1)
+plot_image(ps1.get_image())
+
 
 
 

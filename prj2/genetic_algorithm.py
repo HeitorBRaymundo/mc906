@@ -5,13 +5,12 @@ from puzzle import Puzzle
 
 from selection import roulette_selection, tournament_selection
 from crossover import crossover_best_piece_fitness, crossover_random_split, crossover_best_row, \
-    crossover_alternate_pieces
-from mutation import mutation_swap_pieces, mutation_swap_lines_columns
+    crossover_alternate_pieces, crossover_max_random_split
+from mutation import mutation_swap_pieces, mutation_swap_lines_columns, mutation_split_change_swap_pieces
 from replacement import elitism, steady_state, extermination
 from utils import plot_image, Timer, Animation
 from custom_statistics import Statistics
 import numpy as np
-
 
 def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, fitness='relative', selection='roulette',
                           crossover='random_split', mutation='swap_pieces', replace='elitism', selection_count=None,
@@ -142,6 +141,12 @@ class GeneticAlgorithm:
             self.puzzle.correct_solution(child)
         return child_list
 
+    def _crossover_max_random_split(self, parent1, parent2):
+        child_list = crossover_max_random_split(parent1, parent2)
+        for child in child_list:
+            self.puzzle.correct_solution(child)
+        return child_list
+
     def _crossover_best_row(self, parent1, parent2):
         child_list = crossover_best_row(parent1, parent2)
         for child in child_list:
@@ -170,6 +175,9 @@ class GeneticAlgorithm:
 
     def _mutation_swap_lines_columns(self, proposed_solution):
         mutation_swap_lines_columns(proposed_solution)
+
+    def _mutation_split_change_swap_pieces(self, proposed_solution):
+        mutation_split_change_swap_pieces(proposed_solution)
 
     def _replace(self, next_gen):
         '''

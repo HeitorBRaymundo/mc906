@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Piece:
 
     def __init__(self, image, posX, posY):
@@ -7,18 +8,16 @@ class Piece:
         self.image_pad = np.pad(self.image, ((1, 1), (1, 1), (0, 0)), 'constant', constant_values=0)
         self.pos = (posX, posY)
         self.neighbors = (None, None, None, None)
-        self.fitness = np.inf
 
     def set_neighbors(self, up, right, down, left):
         self.neighbors = (up, right, down, left)
 
     def eval_absolute(self, posX, posY):
-        return int((posX, posY) == self.pos)
+        return 1 - int((posX, posY) == self.pos)
 
     def eval_relative(self, up, right, down, left):
-        self.fitness = int(up == self.neighbors[0]) + int(right == self.neighbors[1]) + \
-               int(down == self.neighbors[2]) + int(left == self.neighbors[3])
-        return self.fitness
+        return 4 - (int(up == self.neighbors[0]) + int(right == self.neighbors[1]) +
+                    int(down == self.neighbors[2]) + int(left == self.neighbors[3]))
 
 
 class PiecesManager:
