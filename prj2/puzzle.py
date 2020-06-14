@@ -54,22 +54,6 @@ class Puzzle(PiecesManager):
         self.pieces_set = list(self.pieces.flatten())
         np.random.shuffle(self.pieces_set)
 
-    def correct_solution2(self, ps):
-        ps_pieces_list = list(ps.pieces.flatten())
-        remaining_set = [item for item in self.pieces_set if item not in ps_pieces_list]
-        track_set = set()
-
-        new_pieces = []
-        for piece in ps.pieces.flatten():
-            if piece not in track_set:
-                new_pieces.append(piece)
-            else:
-                new_pieces.append(remaining_set[0])
-                del remaining_set[0]
-            track_set.add(piece)
-
-        ps.pieces = np.array(new_pieces).reshape(ps.pieces.shape)
-
     def correct_solution(self, ps):
         ps_pieces_list = list(ps.pieces.flatten())
         remaining_set = [item for item in self.pieces_set if item not in ps_pieces_list]

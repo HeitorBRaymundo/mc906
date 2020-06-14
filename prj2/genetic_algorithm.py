@@ -17,7 +17,7 @@ END = ""
 def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, selection='roulette',
                           crossover='random_split', mutation='swap_pieces', replace='elitism', selection_count=None,
                           selection_tournament_size=None, crossover_rate=100, mutation_rate=10,
-                          mutation_swapness=(10, 30), replacement_rate=0.1,
+                          mutation_swapness=(10, 30), mutation_swap_method="standard", replacement_rate=0.1,
                           max_iterations=10, report_time=1):
     np.random.seed(42)
     random.seed(42)
@@ -26,9 +26,26 @@ def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, selection='roule
 
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, selection=selection, crossover=crossover,
                           mutation=mutation, replace=replace, selection_count=selection_count,
-                          selection_tournament_size=selection_tournament_size, mutation_rate=mutation_rate,
-                          crossover_rate=crossover_rate, mutation_swapness=mutation_swapness,
-                          replacement_rate=replacement_rate)
+                          selection_tournament_size=selection_tournament_size, crossover_rate=crossover_rate,
+                          mutation_rate=mutation_rate, mutation_swapness=mutation_swapness,
+                          mutation_swap_method=mutation_swap_method, replacement_rate=replacement_rate)
+
+    parameters = {
+        'pop_size': ga.size,
+        'selection': ga.selection,
+        'crossover': ga.crossover,
+        'mutation': ga.mutation,
+        'replace': ga.replace,
+        'selection_count': ga.selection_count,
+        'selection_tournament_size': ga.selection_tournament_size,
+        'crossover_rate': ga.crossover_rate,
+        'mutation_rate': ga.selection_tournament_size,
+        'mutation_swapness': ga.mutation_swapness,
+        'mutation_swap_method': ga.mutation_swap_method,
+        'replacement_rate': ga.replacement_rate,
+    }
+
+    print("Parametros utilizados: {}".format(parameters))
 
     print("Número de combinações possíveis: {}".format(puzzle.get_avg_rand_iterations()))
 
@@ -44,7 +61,7 @@ def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, selection='roule
 
     print()
     print("Tempo de execução: {}s".format(timer_algorithm.get_past()))
-    plot_image(ga.get_best().get_image_grid(), figsize=(16, 9), titles=["Melhor indivíduo final"], fontsize=24)
+    plot_image(ga.get_best().get_image_grid(), figsize=(10, 7), titles=["Melhor indivíduo final"], fontsize=16)
     ga.statistics.plot()
     print("Generating video... ")
     animation.show_video()
@@ -55,7 +72,7 @@ class GeneticAlgorithm:
 
     def __init__(self, puzzle, size, selection, crossover, mutation, replace,
                  selection_count, selection_tournament_size, crossover_rate, mutation_rate,
-                 mutation_swapness, replacement_rate):
+                 mutation_swapness, mutation_swap_method, replacement_rate):
 
         self.puzzle = puzzle
         self.population = []
@@ -75,6 +92,7 @@ class GeneticAlgorithm:
         self.crossover_rate = crossover_rate
         self.mutation_rate = mutation_rate
         self.mutation_swapness = mutation_swapness
+        self.mutation_swap_method = mutation_swap_method
         self.replacement_rate = replacement_rate
 
         self.statistics = Statistics()
@@ -172,13 +190,13 @@ class GeneticAlgorithm:
         return population
 
     def _mutation_swap_pieces(self, proposed_solution):
-        mutation_swap_pieces(proposed_solution, self.mutation_swapness)
+        mutation_swap_pieces(proposed_solution, self.mutation_swapness, self.mutation_swap_method)
 
     def _mutation_swap_lines_columns(self, proposed_solution):
         mutation_swap_lines_columns(proposed_solution)
 
     def _mutation_split_change_swap_pieces(self, proposed_solution):
-        mutation_split_change_swap_pieces(proposed_solution)
+        mutation_split_change_swap_pieces(proposed_solution, self.mutation_swapness, self.mutation_swap_method)
 
     def _replace(self, next_gen):
         '''
