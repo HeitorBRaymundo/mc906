@@ -1,16 +1,18 @@
 import random
 
+import numpy as np
+
+from crossover import (crossover_alternate_pieces,
+                       crossover_best_piece_fitness, crossover_best_row,
+                       crossover_max_random_split, crossover_random_split)
+from custom_statistics import Statistics
+from mutation import (mutation_split_change_swap_pieces,
+                      mutation_swap_lines_columns, mutation_swap_pieces)
 from proposed_solution import ProposedSolution
 from puzzle import Puzzle
-
+from replacement import elitism, extermination, steady_state
 from selection import roulette_selection, tournament_selection
-from crossover import crossover_best_piece_fitness, crossover_random_split, crossover_best_row, \
-    crossover_alternate_pieces, crossover_max_random_split
-from mutation import mutation_swap_pieces, mutation_swap_lines_columns, mutation_split_change_swap_pieces
-from replacement import elitism, steady_state, extermination
-from utils import plot_image, Timer, Animation
-from custom_statistics import Statistics
-import numpy as np
+from utils import Animation, Timer, plot_image
 
 END = ""
 
