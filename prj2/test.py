@@ -22,15 +22,27 @@ plot_image(child.get_image())
 
 """
 
-puzzle = Puzzle('imgs/star-wars.jpg', 3, 3)
-ps1 = ProposedSolution(puzzle.pieces)
-copy = puzzle.pieces[0][0]
-puzzle.pieces[0][0] = puzzle.pieces[1][1]
-puzzle.pieces[1][1] = copy
+puzzle = Puzzle('imgs/star-wars.jpg', 3, 4)
+
+ps1 = ProposedSolution(np.copy(puzzle.pieces))
+copy = ps1.pieces[0][0]
+ps1.pieces[0][0] = ps1.pieces[1][1]
+ps1.pieces[1][1] = copy
 ps1.fitness_relative()
-plot_image(ps1.get_image())
-mutation._mutation_swap_pieces(ps1)
-plot_image(ps1.get_image())
+
+
+
+
+ps2 = ProposedSolution(np.copy(puzzle.pieces))
+copy = ps2.pieces[2][2]
+ps2.pieces[2][2] = ps2.pieces[1][2]
+ps2.pieces[1][2] = copy
+
+ps2.fitness_relative()
+
+plot_image(ps1.get_image(), ps2.get_image())
+childs = crossover.crossover_max_random_split(ps1, ps2)
+plot_image(childs[0].get_image(), childs[1].get_image())
 
 
 
