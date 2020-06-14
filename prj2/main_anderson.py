@@ -12,8 +12,8 @@ genetic_algorithm.END = "\n"
 
 
 
-exp_genetic_algorithm('imgs/star-wars.jpg', (8, 8),
-                      pop_size=100, max_iterations=10000, mutation='split_change_swap_pieces',  crossover='random_split')
+exp_genetic_algorithm('imgs/star-wars.jpg', (5, 5),
+                      pop_size=5, max_iterations=10000, mutation='swap_pieces',  crossover='random_split', mutation_swap_method="smart")
 
 #puzzle = Puzzle('imgs/triforce.png', 3, 4)
 #ps1 = ProposedSolution(puzzle.gen_shuffle_pieces())

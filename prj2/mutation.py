@@ -9,7 +9,7 @@ def mutation_swap_lines_columns(ps):
         _mutation_swap_columns(ps)
 
 
-def mutation_split_change_swap_pieces(ps):
+def mutation_split_change_swap_pieces(ps, swapness=(10, 30), method="standard"):
     if random.randint(0, 1):
         copy = np.copy(ps.pieces)
         if random.randint(0, 1):
@@ -23,19 +23,19 @@ def mutation_split_change_swap_pieces(ps):
             ps.pieces[:, :difference] = copy[:, split_point:]
             ps.pieces[:, difference:] = copy[:, :split_point]
     else:
-        swap_rate = random.randint(10, 30) / 100
-        number_of_swaps = int(ps.pieces.shape[0] * ps.pieces.shape[1] * swap_rate)
-        for i in range(0, number_of_swaps):
-            _mutation_swap_pieces(ps)
+        mutation_swap_pieces(ps, swapness, method)
 
-def mutation_swap_pieces(ps, swapness=(10, 30)):
+
+def mutation_swap_pieces(ps, swapness=(10, 30), method="standard"):
     # Swap: swapping n cells, where n is a number calculated giving the size of the puzzle and a random rate
     swap_rate = random.randint(swapness[0], swapness[1]) / 100
     number_of_swaps = int(ps.pieces.shape[0] * ps.pieces.shape[1] * swap_rate)
 
     for i in range(0, number_of_swaps):
-        _mutation_swap_pieces(ps)
-
+        if method == "standard":
+            _mutation_swap_pieces_standard(ps)
+        else:
+            _mutation_swap_pieces_smart(ps)
 
 def _mutation_swap_lines(ps):
     # Swap sequence: swapping lines
@@ -66,7 +66,8 @@ def _mutation_swap_columns(ps):
     ps.pieces[:, swap_to_column] = from_column
     ps.pieces[:, swap_from_column] = to_column
 
-def _mutation_swap_pieces(ps):
+
+def _mutation_swap_pieces_standard(ps):
     rand_from_row = random.randint(0, ps.pieces.shape[0] - 1)
     rand_from_col = random.randint(0, ps.pieces.shape[1] - 1)
 
@@ -83,8 +84,8 @@ def _mutation_swap_pieces(ps):
     ps.pieces[rand_to_row][rand_to_col] = from_cel
     ps.pieces[rand_from_row][rand_from_col] = to_cel
 
-"""
-def _mutation_swap_pieces(ps):
+
+def _mutation_swap_pieces_smart(ps):
 
     def __search_agg_fitness(agg_fitness, drawn_value):
         for i in range(0, len(agg_fitness)):
@@ -106,4 +107,3 @@ def _mutation_swap_pieces(ps):
     ps.pieces[int(from_piece / ps.pieces.shape[1])][from_piece % ps.pieces.shape[1]] = \
         ps.pieces[int(to_piece / ps.pieces.shape[1])][to_piece % ps.pieces.shape[1]]
     ps.pieces[int(to_piece / ps.pieces.shape[1])][to_piece % ps.pieces.shape[1]] = copy
-"""

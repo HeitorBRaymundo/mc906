@@ -17,7 +17,7 @@ END = ""
 def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, selection='roulette',
                           crossover='random_split', mutation='swap_pieces', replace='elitism', selection_count=None,
                           selection_tournament_size=None, crossover_rate=100, mutation_rate=10,
-                          mutation_swapness=(10, 30), replacement_rate=0.1,
+                          mutation_swapness=(10, 30), mutation_swap_method="standard", replacement_rate=0.1,
                           max_iterations=10, report_time=1):
     np.random.seed(42)
     random.seed(42)
@@ -28,7 +28,7 @@ def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, selection='roule
                           mutation=mutation, replace=replace, selection_count=selection_count,
                           selection_tournament_size=selection_tournament_size, mutation_rate=mutation_rate,
                           crossover_rate=crossover_rate, mutation_swapness=mutation_swapness,
-                          replacement_rate=replacement_rate)
+                          mutation_swap_method=mutation_swap_method, replacement_rate=replacement_rate)
 
     print("Número de combinações possíveis: {}".format(puzzle.get_avg_rand_iterations()))
 
@@ -55,7 +55,7 @@ class GeneticAlgorithm:
 
     def __init__(self, puzzle, size, selection, crossover, mutation, replace,
                  selection_count, selection_tournament_size, crossover_rate, mutation_rate,
-                 mutation_swapness, replacement_rate):
+                 mutation_swapness, mutation_swap_method, replacement_rate):
 
         self.puzzle = puzzle
         self.population = []
@@ -75,6 +75,7 @@ class GeneticAlgorithm:
         self.crossover_rate = crossover_rate
         self.mutation_rate = mutation_rate
         self.mutation_swapness = mutation_swapness
+        self.mutation_swap_method = mutation_swap_method
         self.replacement_rate = replacement_rate
 
         self.statistics = Statistics()
@@ -172,13 +173,13 @@ class GeneticAlgorithm:
         return population
 
     def _mutation_swap_pieces(self, proposed_solution):
-        mutation_swap_pieces(proposed_solution, self.mutation_swapness)
+        mutation_swap_pieces(proposed_solution, self.mutation_swapness, self.mutation_swap_method)
 
     def _mutation_swap_lines_columns(self, proposed_solution):
         mutation_swap_lines_columns(proposed_solution)
 
     def _mutation_split_change_swap_pieces(self, proposed_solution):
-        mutation_split_change_swap_pieces(proposed_solution)
+        mutation_split_change_swap_pieces(proposed_solution, self.mutation_swapness, self.mutation_swap_method)
 
     def _replace(self, next_gen):
         '''
