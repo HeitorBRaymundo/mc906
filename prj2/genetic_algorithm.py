@@ -85,8 +85,9 @@ class GeneticAlgorithm:
             self.selection_count = round(size / 2)
         else:
             self.selection_count = selection_count
+
         if selection_tournament_size is None:
-            self.selection_tournament_size = round(size / 2)
+            self.selection_tournament_size = round(size * 0.01) # 1 percent of population size
         else:
             self.selection_tournament_size = selection_tournament_size
         self.crossover_rate = crossover_rate
