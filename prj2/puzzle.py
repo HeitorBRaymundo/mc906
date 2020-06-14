@@ -41,7 +41,7 @@ class Puzzle(PiecesManager):
             for j in range(hsplits):
                 si = i * piece_h
                 sj = j * piece_w
-                self.pieces[i][j] = Piece(self.image[si:si + piece_h, sj:sj + piece_w], j, i)
+                self.pieces[i][j] = Piece(self.image[si:si + piece_h, sj:sj + piece_w])
 
         for i in range(vsplits):
             for j in range(hsplits):

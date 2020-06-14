@@ -12,15 +12,6 @@ class ProposedSolution(PiecesManager):
         self.fitness_row = np.full(self.pieces.shape[0], np.inf)
         self.fitness_column = np.full(self.pieces.shape[1], np.inf)
 
-    def fitness_absolute(self):
-        """
-        Conta o numero de peças na posição incorreta
-        """
-        self.fitness_matrix = np.array([[(self.pieces[i][j].eval_absolute(j, i))
-                                         for j in range(self.pieces.shape[1])] for i in range(self.pieces.shape[0])])
-
-        return self._complete_fitness()
-
     def fitness_relative(self):
         """
         Conta o numero total de vizinhos errados
@@ -31,9 +22,6 @@ class ProposedSolution(PiecesManager):
                                                                          self.get_piece(i, j - 1))
                                          for j in range(self.pieces.shape[1])] for i in range(self.pieces.shape[0])])
 
-        return self._complete_fitness()
-
-    def _complete_fitness(self):
         self.fitness_column = np.sum(self.fitness_matrix, axis=0)
         self.fitness_row = np.sum(self.fitness_matrix, axis=1)
         self.fitness = np.sum(self.fitness_matrix)

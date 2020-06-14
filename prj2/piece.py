@@ -3,17 +3,13 @@ import numpy as np
 
 class Piece:
 
-    def __init__(self, image, posX, posY):
+    def __init__(self, image):
         self.image = image
         self.image_pad = np.pad(self.image, ((1, 1), (1, 1), (0, 0)), 'constant', constant_values=0)
-        self.pos = (posX, posY)
         self.neighbors = (None, None, None, None)
 
     def set_neighbors(self, up, right, down, left):
         self.neighbors = (up, right, down, left)
-
-    def eval_absolute(self, posX, posY):
-        return 1 - int((posX, posY) == self.pos)
 
     def eval_relative(self, up, right, down, left):
         return 4 - (int(up == self.neighbors[0]) + int(right == self.neighbors[1]) +

@@ -12,7 +12,9 @@ from utils import plot_image, Timer, Animation
 from custom_statistics import Statistics
 import numpy as np
 
-def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, fitness='relative', selection='roulette',
+END = ""
+
+def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, selection='roulette',
                           crossover='random_split', mutation='swap_pieces', replace='elitism', selection_count=None,
                           selection_tournament_size=None, crossover_rate=100, mutation_rate=10,
                           mutation_swapness=(10, 30), replacement_rate=0.1,
@@ -22,7 +24,7 @@ def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, fitness='relativ
 
     puzzle = Puzzle(puzzle_file, puzzle_splits[0], puzzle_splits[1])
 
-    ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, fitness=fitness, selection=selection, crossover=crossover,
+    ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, selection=selection, crossover=crossover,
                           mutation=mutation, replace=replace, selection_count=selection_count,
                           selection_tournament_size=selection_tournament_size, mutation_rate=mutation_rate,
                           crossover_rate=crossover_rate, mutation_swapness=mutation_swapness,
@@ -37,7 +39,7 @@ def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, fitness='relativ
     while ga.iterations < max_iterations and not ga.stop_criteria():
         ga.iterate()
         if timer.check():
-            print('Iteração atual {}: {}\r'.format(ga.iterations, ga.statistics.get_last()), end="")
+            print('Iteração atual {}: {}\r'.format(ga.iterations, ga.statistics.get_last()), end=END)
         animation.append_new_frame(ga.get_best().get_image(), "Melhor indivíduo iteração {}".format(ga.iterations))
 
     print()
@@ -51,14 +53,13 @@ def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, fitness='relativ
 
 class GeneticAlgorithm:
 
-    def __init__(self, puzzle, size, fitness, selection, crossover, mutation, replace,
+    def __init__(self, puzzle, size, selection, crossover, mutation, replace,
                  selection_count, selection_tournament_size, crossover_rate, mutation_rate,
                  mutation_swapness, replacement_rate):
 
         self.puzzle = puzzle
         self.population = []
         self.size = size
-        self.fitness = fitness
         self.selection = selection
         self.crossover = crossover
         self.mutation = mutation
@@ -90,7 +91,7 @@ class GeneticAlgorithm:
     def _eval_fitness(self, population):
         # chama o metodo fitness_absolute ou fitness_relative de cada individuo
         for ps in population:
-            getattr(ps, 'fitness_{}'.format(self.fitness))()
+            ps.fitness_relative()
 
     def sort_population(self):
         self.population.sort()

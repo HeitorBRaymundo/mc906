@@ -8,7 +8,7 @@ import math
 
 #%%
 
-genetic_algorithm.BAR_R = ""
+genetic_algorithm.END = "\n"
 
 
 
