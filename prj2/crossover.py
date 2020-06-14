@@ -1,4 +1,5 @@
 import random
+
 import numpy as np
 
 from proposed_solution import ProposedSolution
@@ -6,7 +7,7 @@ from proposed_solution import ProposedSolution
 
 def crossover_best_piece_fitness(parent1, parent2):
     fitness_flatten1 = parent1.fitness_matrix.flatten()
-    fitness_flatten2 = parent1.fitness_matrix.flatten()
+    fitness_flatten2 = parent2.fitness_matrix.flatten()
 
     pieces_child = np.array([piece1 if fitness_flatten1[i] < fitness_flatten2[i] else piece2
                              for i, (piece1, piece2) in
