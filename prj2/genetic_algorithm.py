@@ -26,9 +26,26 @@ def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, selection='roule
 
     ga = GeneticAlgorithm(puzzle=puzzle, size=pop_size, selection=selection, crossover=crossover,
                           mutation=mutation, replace=replace, selection_count=selection_count,
-                          selection_tournament_size=selection_tournament_size, mutation_rate=mutation_rate,
-                          crossover_rate=crossover_rate, mutation_swapness=mutation_swapness,
+                          selection_tournament_size=selection_tournament_size, crossover_rate=crossover_rate,
+                          mutation_rate=mutation_rate, mutation_swapness=mutation_swapness,
                           mutation_swap_method=mutation_swap_method, replacement_rate=replacement_rate)
+
+    parameters = {
+        'pop_size': ga.size,
+        'selection': ga.selection,
+        'crossover': ga.crossover,
+        'mutation': ga.mutation,
+        'replace': ga.replace,
+        'selection_count': ga.selection_count,
+        'selection_tournament_size': ga.selection_tournament_size,
+        'crossover_rate': ga.crossover_rate,
+        'mutation_rate': ga.selection_tournament_size,
+        'mutation_swapness': ga.mutation_swapness,
+        'mutation_swap_method': ga.mutation_swap_method,
+        'replacement_rate': ga.replacement_rate,
+    }
+
+    print("Parametros utilizados: {}".format(parameters))
 
     print("Número de combinações possíveis: {}".format(puzzle.get_avg_rand_iterations()))
 
@@ -44,7 +61,7 @@ def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, selection='roule
 
     print()
     print("Tempo de execução: {}s".format(timer_algorithm.get_past()))
-    plot_image(ga.get_best().get_image_grid(), figsize=(16, 9), titles=["Melhor indivíduo final"], fontsize=24)
+    plot_image(ga.get_best().get_image_grid(), figsize=(10, 7), titles=["Melhor indivíduo final"], fontsize=16)
     ga.statistics.plot()
     print("Generating video... ")
     animation.show_video()
@@ -68,8 +85,9 @@ class GeneticAlgorithm:
             self.selection_count = round(size / 2)
         else:
             self.selection_count = selection_count
+
         if selection_tournament_size is None:
-            self.selection_tournament_size = round(size / 2)
+            self.selection_tournament_size = round(size * 0.01) # 1 percent of population size
         else:
             self.selection_tournament_size = selection_tournament_size
         self.crossover_rate = crossover_rate
