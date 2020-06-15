@@ -36,35 +36,6 @@ def crossover_random_split(parent1, parent2):
     return [ProposedSolution(pieces_child1), ProposedSolution(pieces_child2)]
 
 
-def crossover_max_random_split(parent1, parent2):
-    pieces_child1 = np.empty_like(parent1.pieces)
-    pieces_child2 = np.empty_like(parent2.pieces)
-
-    def __search_agg_fitness(agg_fitness, drawn_value):
-        for i in range(1, len(agg_fitness)):
-            if (agg_fitness[i] >= drawn_value):
-                return i
-
-    if random.randint(0, 1):
-        aggregated_fitness = np.cumsum(np.max(parent1.fitness_matrix, axis=1))
-        drawn_value = random.randint(aggregated_fitness[0], aggregated_fitness[-1]-1)
-        split_point = __search_agg_fitness(aggregated_fitness, drawn_value)
-        pieces_child1[:split_point, :] = parent1.pieces[:split_point, :]
-        pieces_child1[split_point:, :] = parent2.pieces[split_point:, :]
-        pieces_child2[:split_point, :] = parent2.pieces[:split_point, :]
-        pieces_child2[split_point:, :] = parent1.pieces[split_point:, :]
-    else:
-        aggregated_fitness = np.cumsum(np.max(parent1.fitness_matrix, axis=0))
-        drawn_value = random.randint(aggregated_fitness[0], aggregated_fitness[-1]-1)
-        split_point = __search_agg_fitness(aggregated_fitness, drawn_value)
-        pieces_child1[:, :split_point] = parent1.pieces[:, :split_point]
-        pieces_child1[:, split_point:] = parent2.pieces[:, split_point:]
-        pieces_child2[:, :split_point] = parent2.pieces[:, :split_point]
-        pieces_child2[:, split_point:] = parent1.pieces[:, split_point:]
-
-    return [ProposedSolution(pieces_child1), ProposedSolution(pieces_child2)]
-
-
 def crossover_best_row(parent1, parent2):
     parent1_best_row = np.argmin(parent1.fitness_row)
     parent2_best_row = np.argmin(parent2.fitness_row)

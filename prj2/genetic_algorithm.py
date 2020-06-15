@@ -4,7 +4,7 @@ import numpy as np
 
 from crossover import (crossover_alternate_pieces,
                        crossover_best_piece_fitness, crossover_best_row,
-                       crossover_max_random_split, crossover_random_split)
+                       crossover_random_split)
 from custom_statistics import Statistics
 from mutation import (mutation_split_change_swap_pieces,
                       mutation_swap_lines_columns, mutation_swap_pieces)
@@ -41,7 +41,7 @@ def exp_genetic_algorithm(puzzle_file, puzzle_splits, pop_size, selection='roule
         'selection_count': ga.selection_count,
         'selection_tournament_size': ga.selection_tournament_size,
         'crossover_rate': ga.crossover_rate,
-        'mutation_rate': ga.selection_tournament_size,
+        'mutation_rate': ga.mutation_rate,
         'mutation_swapness': ga.mutation_swapness,
         'mutation_swap_method': ga.mutation_swap_method,
         'replacement_rate': ga.replacement_rate,
@@ -159,12 +159,6 @@ class GeneticAlgorithm:
 
     def _crossover_random_split(self, parent1, parent2):
         child_list = crossover_random_split(parent1, parent2)
-        for child in child_list:
-            self.puzzle.correct_solution(child)
-        return child_list
-
-    def _crossover_max_random_split(self, parent1, parent2):
-        child_list = crossover_max_random_split(parent1, parent2)
         for child in child_list:
             self.puzzle.correct_solution(child)
         return child_list
