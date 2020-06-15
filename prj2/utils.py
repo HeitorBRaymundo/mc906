@@ -58,7 +58,7 @@ class Animation:
         self.labels = self.labels[:-10]
 
     def show_video(self):
-        self.fig, self.ax = plt.subplots(figsize=(12, 7))
+        self.fig, self.ax = plt.subplots(figsize=(9, 6))
         self.ax.set_yticklabels([])
         self.ax.set_xticklabels([])
         self.ax.xaxis.set_ticks_position('none')

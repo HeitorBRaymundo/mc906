@@ -8,24 +8,6 @@ def mutation_swap_lines_columns(ps):
     else:
         _mutation_swap_columns(ps)
 
-
-def mutation_split_change_swap_pieces(ps, swapness=(10, 30), method="standard"):
-    if random.randint(0, 1):
-        copy = np.copy(ps.pieces)
-        if random.randint(0, 1):
-            split_point = random.randint(1, ps.pieces.shape[0] - 1)
-            difference = ps.pieces.shape[0] - split_point
-            ps.pieces[:difference, :] = copy[split_point:, :]
-            ps.pieces[difference:, :] = copy[:split_point, :]
-        else:
-            split_point = random.randint(1, ps.pieces.shape[1] - 1)
-            difference = ps.pieces.shape[1] - split_point
-            ps.pieces[:, :difference] = copy[:, split_point:]
-            ps.pieces[:, difference:] = copy[:, :split_point]
-    else:
-        mutation_swap_pieces(ps, swapness, method)
-
-
 def mutation_swap_pieces(ps, swapness=(10, 30), method="standard"):
     # Swap: swapping n cells, where n is a number calculated giving the size of the puzzle and a random rate
     swap_rate = random.randint(swapness[0], swapness[1]) / 100

@@ -6,8 +6,7 @@ from crossover import (crossover_alternate_pieces,
                        crossover_best_piece_fitness, crossover_best_row,
                        crossover_random_split)
 from custom_statistics import Statistics
-from mutation import (mutation_split_change_swap_pieces,
-                      mutation_swap_lines_columns, mutation_swap_pieces)
+from mutation import (mutation_swap_lines_columns, mutation_swap_pieces)
 from proposed_solution import ProposedSolution
 from puzzle import Puzzle
 from replacement import elitism, extermination, steady_state
@@ -143,7 +142,7 @@ class GeneticAlgorithm:
         next_gen = []
         for i in range(1, len(selected_parents), 2):
             check_rate = random.randint(0, 100)
-            if check_rate <= self.mutation_rate:
+            if check_rate <= self.crossover_rate:
                 parent1 = selected_parents[i - 1]
                 parent2 = selected_parents[i]
                 child_list = getattr(self, '_crossover_{}'.format(self.crossover))(parent1, parent2)
@@ -191,10 +190,7 @@ class GeneticAlgorithm:
 
     def _mutation_swap_lines_columns(self, proposed_solution):
         mutation_swap_lines_columns(proposed_solution)
-
-    def _mutation_split_change_swap_pieces(self, proposed_solution):
-        mutation_split_change_swap_pieces(proposed_solution, self.mutation_swapness, self.mutation_swap_method)
-
+        
     def _replace(self, next_gen):
         '''
         retorna proxima geracao
