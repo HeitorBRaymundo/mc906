@@ -2,6 +2,7 @@ from data import Data
 from data_collector import DataCollector
 from enumerations import Author, Device, Spell
 from utils import KeyListener, user_confirmation, print_local_ip
+import numpy as np
 
 AUTHOR = Author.ANDERSON
 DEVICE = Device.SAMSUNG_A5
@@ -31,19 +32,26 @@ while 1:
 
         print("Foram capurados {} dados, totalizando {:.2f} segundos. ".format(len(readings), readings[-1][0]-readings[0][0]))
         times_sub = readings[1:, 0][::-1] - readings[:-1, 0][::-1]
-        print(times_sub)
+        print(np.sort(times_sub))
 
-        if max(times_sub) < 0.1:
-            data = Data(readings, SPELL, AUTHOR, DEVICE)
+        incomplete_ratio = np.count_nonzero(np.isnan(readings))/readings.size
+        print(incomplete_ratio)
 
-            if AUTO_SAVE_CONTINUE or user_confirmation("Deseja salvar?"):
-                data.save()
+        if incomplete_ratio < 0.01:
+            if max(times_sub) < 0.1:
+                data = Data(readings, SPELL, AUTHOR, DEVICE)
+
+                if AUTO_SAVE_CONTINUE or user_confirmation("Deseja salvar?"):
+                    data.save()
+                    print("DADOS SALVOS!!! ")
+                else:
+                    print("Operação salvar cancelada. ")
+
+                if not AUTO_SAVE_CONTINUE and not user_confirmation("Continuar capturando novos dados?"):
+                    break
             else:
-                print("Operação salvar cancelada. ")
-
-            if not AUTO_SAVE_CONTINUE and not user_confirmation("Continuar capturando novos dados?"):
-                break
+                print("ERRO: DELAY SUPERIOR A 0.1s ENTRE AS MENSAGENS!!! ")
         else:
-            print("ERRO: DELAY SUPERIOR A 0.1s ENTRE AS MENSAGENS!!! ")
+            print("ERRO: MUITAS MENSAGENS IMCOMPLETAS!!! ")
     else:
         print("ERRO: LEITURA MENOR QUE 20 DADOS!!! ")
