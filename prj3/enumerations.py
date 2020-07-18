@@ -9,9 +9,12 @@ class AutoName(Enum):
 
 # Labels
 class Spell(AutoName):
-    INCENDIO = auto()
     WINGARDIUM_LEVIOSA = auto()
-    VENTUS = auto()
+    ALOHOMORA = auto()
+    ARRESTO_MOMENTUM = auto()
+    FINITE_INCANTATEM = auto()
+    REVELIO = auto()
+    INCENDIO = auto()
 
 class Author(AutoName):
     ANDERSON = auto()
