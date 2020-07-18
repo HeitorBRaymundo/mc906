@@ -4,8 +4,8 @@ from enumerations import Author, Device, Spell
 from utils import KeyListener, user_confirmation, print_local_ip
 import numpy as np
 
-AUTHOR = Author.ANDERSON
-DEVICE = Device.SAMSUNG_A5
+AUTHOR = Author.HEITOR
+DEVICE = Device.MOTO_X
 SPELL = Spell.INCENDIO
 AUTO_SAVE_CONTINUE = True
 
