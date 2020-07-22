@@ -25,4 +25,5 @@ class Author(AutoName):
 
 class Device(AutoName):
     SAMSUNG_A5 = auto()
+    SAMSUNG_S8 = auto()
 
