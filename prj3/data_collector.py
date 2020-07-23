@@ -8,7 +8,7 @@ import numpy as np
 
 AUTHOR = Author.ANDERSON
 DEVICE = Device.SAMSUNG_A5
-SPELL = Spell.INCENDIO
+SPELL = Spell.ALOHOMORA
 PORT = 5555
 
 print_local_ip()
@@ -27,27 +27,34 @@ def collect():
         "GRA": [],
         "LAC": [],
         "RTV": [],
-        "GRV": [],
         "RTM": [],
         "ORI": []
     }
+
 
     for data_list in list(csv.reader(content.splitlines(), skipinitialspace=True)):
         read = [float(data_list[1])]
         read.extend([float(data) for data in data_list[2:]])
         readings[data_list[0]].append(read)
 
-    print(readings)
     data_len = 0
+
+    first_timestamp_list = []
     for key in readings.keys():
         readings[key] = np.array(readings[key])
         if len(readings[key]) > 1:
             readings[key] = readings[key][np.argsort(readings[key][:, 0])]
         data_len = data_len + len(readings[key])
+        first_timestamp_list.append(readings[key][0][0])
+
+    first_timestamp = min(first_timestamp_list)
+    for key in readings.keys():
+        for read in readings[key]:
+            read[0] = read[0] - first_timestamp
 
     data = Data(readings, SPELL, AUTHOR, DEVICE)
 
-    print("Foram capurados {} dados, aproximados {:.2f} segundos. ".format(data_len,
+    print("Foram capurados {} dados, aproximados {:.2f} ms. ".format(data_len,
                                                                            readings["ACC"][-1][0] - readings["ACC"][0][
                                                                                0]))
     file_path = data.save()
