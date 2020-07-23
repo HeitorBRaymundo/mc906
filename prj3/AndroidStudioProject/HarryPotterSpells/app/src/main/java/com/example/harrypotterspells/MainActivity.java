@@ -10,7 +10,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -35,8 +34,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Sensor gyroscopeSensor;
     private Sensor linearAccelerationSensor;
     private Sensor rotationVectorSensor;
-
-    private Sensor gameRotationVectorSensor;
     private Sensor magneticFieldSensor;
 
     private StringBuilder sensorData;
@@ -56,12 +53,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private boolean recording;
     private RequestQueue requestQueue;
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
@@ -70,19 +65,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         gyroscopeSensor             = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
         linearAccelerationSensor    = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         rotationVectorSensor        = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-
-        gameRotationVectorSensor        = sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR);
-        magneticFieldSensor             = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        magneticFieldSensor         = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
 
         btnSpell = findViewById(R.id.btnSpell);
-
         txtIp = findViewById(R.id.txtIp);
         txtPort = findViewById(R.id.txtPort);
 
 
         requestQueue = Volley.newRequestQueue(this);
-
 
         btnSpell.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -183,14 +174,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             sensorStringData = "LAC, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 3)+"\n";
         } else if (sensorEvent.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
             sensorStringData = "RTV, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 4)+"\n";
-        } else if (sensorEvent.sensor.getType() == Sensor.TYPE_GAME_ROTATION_VECTOR) {
-            sensorStringData = "GRV, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 4)+"\n";
         }
-
         if ((recording) && (sensorStringData!=null)) {
             sensorData.append(sensorStringData);
-
-            Log.d("MainActivity", sensorStringData);
 
             if (updatedMag && updatedAcc) {
                 updateOrientationAngles(timestamp);
@@ -244,9 +230,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         if (!registerSensor(rotationVectorSensor))
             toast("Não contém sensor rotationVectorSensor");
-
-        if (!registerSensor(gameRotationVectorSensor))
-            toast("Não contém sensor gameRotationVectorSensor");
 
         if (!registerSensor(magneticFieldSensor))
             toast("Não contém sensor magneticFieldSensor");
