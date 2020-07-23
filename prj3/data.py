@@ -47,6 +47,8 @@ class Data:
         with open(file_path, 'wb') as f:
             pickle.dump([self.readings, self.spell, self.author, self.device, self.date], f)
 
+        return file_path
+
     def __str__(self):
         return self.__dict__
 
