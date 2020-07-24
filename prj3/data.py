@@ -92,7 +92,7 @@ def load_database():
     return Database(database)
 
 
-def load_test():
+def load_database_test():
     database = []
     for path in Path(ROOT_FOLDER).rglob('*.pkl'):
         data = Data.load_filepath(str(path))
@@ -101,7 +101,7 @@ def load_test():
     return Database(database)
 
 
-def load_train():
+def load_database_train():
     database = []
     for path in Path(ROOT_FOLDER).rglob('*.pkl'):
         data = Data.load_filepath(str(path))

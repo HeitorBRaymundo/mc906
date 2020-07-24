@@ -1,9 +1,10 @@
-import numpy as np
+import pandas as pd
 
-def custom_cv_2folds(X):
-    n = X.shape[0]
-    i = 1
-    while i <= 2:
-        idx = np.arange(n * (i - 1) / 2, n * i / 2, dtype=int)
-        yield idx, idx
-        i += 1
+def cv_folds_author(database):
+
+    df = pd.DataFrame(data=database.to_dict())
+
+    for author in df['author'].unique():
+        train_idx = df.loc[df['author'] != author].index.values.tolist()
+        valid_idx = df.loc[df['author'] == author].index.values.tolist()
+        yield train_idx, valid_idx

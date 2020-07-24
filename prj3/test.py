@@ -3,11 +3,11 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import LogisticRegression
 
-
-from data import load_train
+from cross_validation import cv_folds_author
+from data import load_database_train
 from preprocessing import InterpolateRawData
 
-database_train = load_train()
+database_train = load_database_train()
 
 pipe = Pipeline([
     ('interpolate', InterpolateRawData(num_samples=10)),
@@ -16,5 +16,5 @@ pipe = Pipeline([
 
 #pipe.fit(database_train.get_datalist(), database_train.get_y())
 
-scores = cross_val_score(pipe, database_train.get_datalist(), database_train.get_y(), cv=10)
+scores = cross_val_score(pipe, database_train.get_datalist(), database_train.get_y(), cv=cv_folds_author(database_train))
 print(scores)
