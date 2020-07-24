@@ -1,16 +1,20 @@
-#%%
+from sklearn.model_selection import cross_val_score
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import LogisticRegression
 
 
-import pandas as pd
-from data import load_database
-from data_interpolation import interpolate_readings
-from plotter import plot_all_readings
-import matplotlib.pyplot as plt
-plt.rcParams.update({'figure.max_open_warning': 0})
+from data import load_train
+from preprocessing import InterpolateRawData
 
-database = pd.DataFrame(data=load_database())
-readings = database['readings'][0]
+database_train = load_train()
 
-print(interpolate_readings(readings))
+pipe = Pipeline([
+    ('interpolate', InterpolateRawData(num_samples=10)),
+    ('knn', LogisticRegression(random_state=0, max_iter=100000))
+])
 
-plot_all_readings(readings)
+#pipe.fit(database_train.get_datalist(), database_train.get_y())
+
+scores = cross_val_score(pipe, database_train.get_datalist(), database_train.get_y(), cv=10)
+print(scores)
