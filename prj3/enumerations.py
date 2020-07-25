@@ -29,5 +29,6 @@ class Author(AutoName):
 class Device(AutoName):
     UNKNOWN = auto()
     SAMSUNG_A5 = auto()
+    MOTO_X = auto()
     SAMSUNG_S8 = auto()
 
