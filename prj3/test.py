@@ -1,20 +1,16 @@
-from sklearn.model_selection import cross_val_score
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.pipeline import Pipeline
-from sklearn.linear_model import LogisticRegression
+from IPython.core.display import display, HTML
 
-from cross_validation import cv_folds_author
-from data import load_database_train
-from preprocessing import InterpolateRawData
+from confusion_matrix import plot_confusion_matrix_from_data
+from data import load_database_test, load_database_train
 
-database_train = load_database_train()
+def test_model(model, train=True):
 
-pipe = Pipeline([
-    ('interpolate', InterpolateRawData(num_samples=10)),
-    ('knn', LogisticRegression(random_state=0, max_iter=100000))
-])
+    train_data = load_database_train()
+    test_data = load_database_test()
 
-#pipe.fit(database_train.get_datalist(), database_train.get_y())
+    if train:
+        model.fit(train_data.get_datalist(), train_data.get_y())
 
-scores = cross_val_score(pipe, database_train.get_datalist(), database_train.get_y(), cv=cv_folds_author(database_train))
-print(scores)
+    display(HTML('<h5>Gráfico Teste Final: </h5>'))
+    predictions = model.predict(test_data.get_datalist())
+    plot_confusion_matrix_from_data(test_data.get_y(), predictions)

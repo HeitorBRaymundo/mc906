@@ -1,9 +1,6 @@
-
 from scipy.interpolate import interp1d
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-
-from sklearn.utils import shuffle
 
 class InterpolateRawData(BaseEstimator, TransformerMixin):
 

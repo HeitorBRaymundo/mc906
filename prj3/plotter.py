@@ -6,7 +6,7 @@ def plot_reading(readings, title=None, ax=None):
     df.plot(title=title, ax=ax)
 
 
-def plot_all_readings(readings_dict, keys=None, table_format=(1, 0), figsize=(15, 15)):
+def plot_all_readings(readings_dict, keys=None, table_format=(0, 2), figsize=(15, 15)):
     if keys is None:
         keys = readings_dict.keys()
 

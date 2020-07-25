@@ -1,8 +1,8 @@
 import pandas as pd
 
-def cv_folds_author(database):
+def cv_folds_author(X):
 
-    df = pd.DataFrame(data=database.to_dict())
+    df = pd.DataFrame(data=[data.__dict__ for data in X])
 
     for author in df['author'].unique():
         train_idx = df.loc[df['author'] != author].index.values.tolist()

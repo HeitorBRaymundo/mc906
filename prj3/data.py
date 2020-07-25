@@ -2,6 +2,7 @@ import os
 import pickle
 from datetime import datetime
 from pathlib import Path
+import numpy as np
 
 from enumerations import Author, Spell
 
@@ -75,15 +76,9 @@ class Database:
 
     def __init__(self, datalist):
         self.datalist = datalist
-
-    def to_dict(self):
-        return [data.__dict__ for data in self.datalist]
-
-    def get_datalist(self):
-        return self.datalist
-
-    def get_y(self):
-        return [data.spell.value for data in self.datalist]
+        self.datadict = [data.__dict__ for data in self.datalist]
+        self.X = np.array(datalist)
+        self.y = np.array([data.spell.value for data in self.datalist])
 
 def load_database():
     database = []
