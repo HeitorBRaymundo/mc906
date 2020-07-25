@@ -9,6 +9,7 @@ class AutoName(Enum):
 
 # Labels
 class Spell(AutoName):
+    UNKNOWN = auto()
     WINGARDIUM_LEVIOSA = auto()
     ALOHOMORA = auto()
     ARRESTO_MOMENTUM = auto()
@@ -17,6 +18,8 @@ class Spell(AutoName):
     INCENDIO = auto()
 
 class Author(AutoName):
+    UNKNOWN = auto()
+    TESTER = auto()
     ANDERSON = auto()
     DIEGO = auto()
     GUILHERME = auto()
@@ -24,6 +27,8 @@ class Author(AutoName):
     YURI = auto()
 
 class Device(AutoName):
+    UNKNOWN = auto()
     SAMSUNG_A5 = auto()
     MOTO_X = auto()
+    SAMSUNG_S8 = auto()
 

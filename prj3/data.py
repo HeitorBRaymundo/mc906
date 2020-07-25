@@ -3,14 +3,10 @@ import pickle
 from datetime import datetime
 from pathlib import Path
 
+from enumerations import Author, Spell
+
 ROOT_FOLDER = 'data'
 
-def load_database():
-    database = []
-    for path in Path(ROOT_FOLDER).rglob('*.pkl'):
-        database.append(Data.load_filepath(str(path)).__dict__)
-
-    return database
 
 class Data:
 
@@ -37,6 +33,10 @@ class Data:
         return Data.load_filepath(file_path)
 
     def save(self):
+
+        if self.spell == Spell.UNKNOWN:
+            return
+
         folder = os.path.join(ROOT_FOLDER, self.author.value, self.spell.value)
 
         if not os.path.exists(folder):
@@ -49,6 +49,62 @@ class Data:
 
         return file_path
 
+    def get_min_timestamp(self):
+        first_timestamp_list = []
+        for key in self.readings.keys():
+            first_timestamp_list.append(self.readings[key][0][0])
+        return min(first_timestamp_list)
+
+    def get_max_timestamp(self):
+        last_timestamp_list = []
+        for key in self.readings.keys():
+            last_timestamp_list.append(self.readings[key][-1][0])
+        return max(last_timestamp_list)
+
+    def get_len(self):
+        data_len = 0
+        for key in self.readings.keys():
+            data_len = data_len + len(self.readings[key])
+        return data_len
+
     def __str__(self):
         return self.__dict__
 
+
+class Database:
+
+    def __init__(self, datalist):
+        self.datalist = datalist
+
+    def to_dict(self):
+        return [data.__dict__ for data in self.datalist]
+
+    def get_datalist(self):
+        return self.datalist
+
+    def get_y(self):
+        return [data.spell.value for data in self.datalist]
+
+def load_database():
+    database = []
+    for path in Path(ROOT_FOLDER).rglob('*.pkl'):
+        database.append(Data.load_filepath(str(path)))
+    return Database(database)
+
+
+def load_database_test():
+    database = []
+    for path in Path(ROOT_FOLDER).rglob('*.pkl'):
+        data = Data.load_filepath(str(path))
+        if data.author == Author.TESTER:
+            database.append(data)
+    return Database(database)
+
+
+def load_database_train():
+    database = []
+    for path in Path(ROOT_FOLDER).rglob('*.pkl'):
+        data = Data.load_filepath(str(path))
+        if data.author != Author.TESTER:
+            database.append(data)
+    return Database(database)

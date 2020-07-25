@@ -7,6 +7,28 @@ from sklearn.model_selection import KFold, GridSearchCV
 import pandas as pd
 import numpy as np
 
+def plot_image(*images, titles=[], table_format=(1, 0), figsize=(15, 15), axis=False, fontsize=20):
+    '''
+    Função auxiliar para comparar diferentes soluções (por imagens)
+    '''
+    max_lines = table_format[0] if table_format[0] != 0 else len(images)
+    max_columns = table_format[1] if table_format[1] != 0 else len(images)
+
+    fig = plt.figure(figsize=figsize)
+    for i, image in enumerate(images):
+        ax = fig.add_subplot(max_lines, max_columns, i + 1)
+
+        if len(titles) == len(images):
+            ax.set_xlabel(titles[i], fontsize=fontsize)
+
+        if axis is False:
+            ax.set_yticklabels([])
+            ax.set_xticklabels([])
+            ax.xaxis.set_ticks_position('none')
+            ax.yaxis.set_ticks_position('none')
+        ax.imshow(image)
+    plt.show()
+
 
 def print_local_ip():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -24,32 +46,6 @@ def user_confirmation(message):
         else:
             print("Digite 'y' ou 'n'")
 
-
-
-def plot_image(*images, titles=[], table_format=(1, 0), figsize=(10, 10), axis=False, fontsize=20, filename=None):
-    max_lines = table_format[0] if table_format[0] != 0 else len(images)
-    max_columns = table_format[1] if table_format[1] != 0 else len(images)
-
-    fig = plt.figure(figsize=figsize)
-    for i, image in enumerate(images):
-        ax = fig.add_subplot(max_lines, max_columns, i + 1)
-
-        if len(titles) == len(images):
-            ax.set_xlabel(titles[i], fontsize=fontsize)
-
-        if axis is False:
-            ax.set_yticklabels([])
-            ax.set_xticklabels([])
-            ax.xaxis.set_ticks_position('none')
-            ax.yaxis.set_ticks_position('none')
-
-        if (len(image.shape) == 2):
-            ax.imshow(image, cmap='gray')
-        else:
-            ax.imshow(image)
-
-    if filename is not None:
-        plt.savefig(filename, format='jpg', pad_inches=0, bbox_inches='tight')
 
 def keras_train_and_validate(model, X, y, epochs=10000, batch_size=None, callbacks=None, cv=3):
 
@@ -76,7 +72,7 @@ def keras_train_and_validate(model, X, y, epochs=10000, batch_size=None, callbac
 
 def grid_search(model, param_grid, X, y, X_test=None, y_test=None, cv=5, n_jobs=6):
 
-    grid = GridSearchCV(estimator=model, param_grid=param_grid, cv=KFold(cv, shuffle=True), scoring='neg_mean_squared_error',
+    grid = GridSearchCV(estimator=model, param_grid=param_grid, cv=cv, scoring='neg_mean_squared_error',
                         return_train_score=True, verbose=10, n_jobs=n_jobs, refit=False)
     grid.fit(X, y)
     sys.stdout.flush()
@@ -86,11 +82,6 @@ def grid_search(model, param_grid, X, y, X_test=None, y_test=None, cv=5, n_jobs=
     cv_results = grid.cv_results_
     df = pd.DataFrame(cv_results)
     df = df[['params', 'mean_train_score', 'std_train_score', 'mean_test_score', 'std_test_score']]
-
-
-    df[['std_train_score', 'std_test_score']] = df[['std_train_score', 'std_test_score']].apply(lambda x: np.sqrt(x))
-    df[['mean_train_score', 'mean_test_score']] = df[['mean_train_score', 'mean_test_score']].apply(
-        lambda x: np.sqrt(-x))
     pd.options.display.float_format = '{:.2f}'.format
     display(df)
 
@@ -103,7 +94,7 @@ def grid_search(model, param_grid, X, y, X_test=None, y_test=None, cv=5, n_jobs=
 
     ax.legend(["Treino", "Validação"])
     ax.set_xlabel('Número do experimento')
-    ax.set_ylabel('Erro RMSE')
+    ax.set_ylabel('Acurácia')
     plt.show()
 
     # Printa melhor modelo (linha da tabela)
@@ -112,8 +103,9 @@ def grid_search(model, param_grid, X, y, X_test=None, y_test=None, cv=5, n_jobs=
 
     # Retreina melhor modelo com validacao
     model.set_params(**grid.best_params_)
+
     #result = Result("train", "val", "train_full", "test")
-    for train_index, val_index in KFold(cv).split(X):
+    for train_index, val_index in cv:
         X_train, X_val = X[train_index], X[val_index]
         y_train, y_val = y[train_index], y[val_index]
 
