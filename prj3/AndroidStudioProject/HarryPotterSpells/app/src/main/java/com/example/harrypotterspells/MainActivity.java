@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
             sensorStringData = "ACC, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 3)+"\n";
         } else if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            //sensorStringData = "GYR, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 3)+"\n";
+            sensorStringData = "GYR, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 3)+"\n";
         }
 
         if ((recording) && (sensorStringData!=null)) {
