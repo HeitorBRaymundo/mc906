@@ -32,4 +32,5 @@ class Device(AutoName):
     MOTO_X = auto()
     SAMSUNG_S8 = auto()
     MOTO_G5S_PLUS = auto()
+    SAMSUNG_NOTE_10 = auto()
 
