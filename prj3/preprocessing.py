@@ -4,7 +4,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 class InterpolateRawData(BaseEstimator, TransformerMixin):
 
-    def __init__(self, features_name=["ACC", "GYR", "MAG", "GRA", "LAC", "RTV", "RTM", "ORI"],
+    def __init__(self, features_name=["ACC", "GYR"],
                  num_samples=50, method='interp1d'):
         super().__init__()
         self.features_name = features_name

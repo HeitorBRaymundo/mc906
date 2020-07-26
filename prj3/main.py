@@ -1,4 +1,5 @@
 import csv
+from collections import defaultdict
 
 from data import Data
 from enumerations import Author, Device, Spell
@@ -11,9 +12,7 @@ app = Flask(__name__)
 PORT = 5555
 
 def convert_data(content, spell, author, device):
-    readings = {
-        "ACC": [], "GYR": [], "MAG": [], "GRA": [], "LAC": [], "RTV": [], "RTM": [], "ORI": []
-    }
+    readings = defaultdict(list)
 
     for data_list in list(csv.reader(content.splitlines(), skipinitialspace=True)):
         read = [float(data_list[1])]
@@ -44,7 +43,7 @@ def collect():
 
     content = request.json["data"]
 
-    data = convert_data(content, AUTHOR, DEVICE, SPELL)
+    data = convert_data(content, SPELL, AUTHOR, DEVICE)
 
     if data is not None:
 
@@ -53,6 +52,9 @@ def collect():
                                                                          data.get_min_timestamp()))
         file_path = data.save()
         print("Dados salvos em {}. ".format(file_path))
+
+    else:
+        print("Dados faltantes...")
 
     return jsonify(success=True)
 

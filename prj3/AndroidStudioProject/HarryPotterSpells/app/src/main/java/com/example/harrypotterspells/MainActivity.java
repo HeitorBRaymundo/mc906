@@ -1,6 +1,5 @@
 package com.example.harrypotterspells;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -8,7 +7,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,22 +28,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private SensorManager sensorManager;
     private Sensor accelerometerSensor;
-    private Sensor gravitySensor;
     private Sensor gyroscopeSensor;
-    private Sensor linearAccelerationSensor;
-    private Sensor rotationVectorSensor;
-    private Sensor magneticFieldSensor;
 
     private StringBuilder sensorData;
-
-    private final float[] accelerometerReading = new float[3];
-    private final float[] magnetometerReading = new float[3];
-
-    private final float[] rotationMatrix = new float[9];
-    private final float[] orientationAngles = new float[3];
-
-    private boolean updatedAcc;
-    private boolean updatedMag;
 
     private Button btnSpell;
     private EditText txtIp, txtPort;
@@ -60,13 +45,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        accelerometerSensor         = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        gravitySensor               = sensorManager.getDefaultSensor(Sensor.TYPE_GRAVITY);
-        gyroscopeSensor             = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
-        linearAccelerationSensor    = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        rotationVectorSensor        = sensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
-        magneticFieldSensor         = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-
+        accelerometerSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        gyroscopeSensor     = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
         btnSpell = findViewById(R.id.btnSpell);
         txtIp = findViewById(R.id.txtIp);
@@ -94,21 +74,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         sensorData = new StringBuilder();
     }
 
-    private void zeroVector(float[] vector){
-        for(int i=0; i<vector.length; i++)
-            vector[i] = 0;
-    }
-
     private void startRecord(){
-        zeroVector(rotationMatrix);
-        zeroVector(orientationAngles);
-        updatedAcc = false;
-        updatedMag = false;
         sensorData = new StringBuilder();
         recording = true;
     }
-
-
 
     private void sendRecord(){
         recording = false;
@@ -153,46 +122,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        //Log.d("MainActivity", sensorEvent.sensor.getName()+": "+sensorEvent.timestamp+", "+ Arrays.toString(sensorEvent.values));
 
         String sensorStringData = null;
         double timestamp = sensorEvent.timestamp/1000000.0;
 
         if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            System.arraycopy(sensorEvent.values, 0, accelerometerReading,0, accelerometerReading.length);
             sensorStringData = "ACC, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 3)+"\n";
-            updatedAcc = true;
-        } else if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
-            System.arraycopy(sensorEvent.values, 0, magnetometerReading,0, magnetometerReading.length);
-            sensorStringData = "MAG, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 3)+"\n";
-            updatedMag = true;
-        } else if (sensorEvent.sensor.getType() == Sensor.TYPE_GRAVITY) {
-            sensorStringData = "GRA, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 3)+"\n";
         } else if (sensorEvent.sensor.getType() == Sensor.TYPE_GYROSCOPE) {
-            sensorStringData = "GYR, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 3)+"\n";
-        } else if (sensorEvent.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
-            sensorStringData = "LAC, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 3)+"\n";
-        } else if (sensorEvent.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-            sensorStringData = "RTV, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 4)+"\n";
+            //sensorStringData = "GYR, "+timestamp+", "+toStringArrayFloat(sensorEvent.values, 3)+"\n";
         }
+
         if ((recording) && (sensorStringData!=null)) {
             sensorData.append(sensorStringData);
-
-            if (updatedMag && updatedAcc) {
-                updateOrientationAngles(timestamp);
-                updatedAcc = false;
-                updatedMag = false;
-            }
         }
-    }
-
-    public void updateOrientationAngles(double timestamp) {
-        SensorManager.getRotationMatrix(rotationMatrix, null,
-                accelerometerReading, magnetometerReading);
-
-        sensorData.append("RTM, "+timestamp+", "+toStringArrayFloat(rotationMatrix, 9)+"\n");
-        SensorManager.getOrientation(rotationMatrix, orientationAngles);
-        sensorData.append("ORI, "+timestamp+", "+toStringArrayFloat(orientationAngles, 3)+"\n");
     }
 
     private void toast(String message){
@@ -219,21 +161,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         if (!registerSensor(accelerometerSensor))
             toast("Não contém accelerometerSensor");
 
-        if (!registerSensor(gravitySensor))
-            toast("Não contém sensor gravitySensor");
-
         if (!registerSensor(gyroscopeSensor))
             toast("Não contém sensor gyroscopeSensor");
-
-        if (!registerSensor(linearAccelerationSensor))
-            toast("Não contém sensor linearAccelerationSensor");
-
-        if (!registerSensor(rotationVectorSensor))
-            toast("Não contém sensor rotationVectorSensor");
-
-        if (!registerSensor(magneticFieldSensor))
-            toast("Não contém sensor magneticFieldSensor");
-
     }
 
     @Override
