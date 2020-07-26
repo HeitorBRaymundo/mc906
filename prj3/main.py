@@ -10,6 +10,31 @@ app = Flask(__name__)
 
 PORT = 5555
 
+def convert_data(content, spell, author, device):
+    readings = {
+        "ACC": [], "GYR": [], "MAG": [], "GRA": [], "LAC": [], "RTV": [], "RTM": [], "ORI": []
+    }
+
+    for data_list in list(csv.reader(content.splitlines(), skipinitialspace=True)):
+        read = [float(data_list[1])]
+        read.extend([float(data) for data in data_list[2:]])
+        readings[data_list[0]].append(read)
+
+    first_timestamp_list = []
+    for key in readings.keys():
+        if len(readings[key]) < 2:
+            return
+        readings[key] = np.array(readings[key])
+        readings[key] = readings[key][np.argsort(readings[key][:, 0])]
+        first_timestamp_list.append(readings[key][0][0])
+
+    first_timestamp = min(first_timestamp_list)
+    for key in readings.keys():
+        for read in readings[key]:
+            read[0] = read[0] - first_timestamp
+
+    return Data(readings, spell, author, device)
+
 
 @app.route('/collect', methods=['POST'])
 def collect():
@@ -49,28 +74,3 @@ if __name__ == '__main__':
     print_local_ip()
     app.run(host='0.0.0.0', port=PORT, debug=True)
 
-
-def convert_data(content, spell, author, device):
-    readings = {
-        "ACC": [], "GYR": [], "MAG": [], "GRA": [], "LAC": [], "RTV": [], "RTM": [], "ORI": []
-    }
-
-    for data_list in list(csv.reader(content.splitlines(), skipinitialspace=True)):
-        read = [float(data_list[1])]
-        read.extend([float(data) for data in data_list[2:]])
-        readings[data_list[0]].append(read)
-
-    first_timestamp_list = []
-    for key in readings.keys():
-        if len(readings[key]) < 2:
-            return
-        readings[key] = np.array(readings[key])
-        readings[key] = readings[key][np.argsort(readings[key][:, 0])]
-        first_timestamp_list.append(readings[key][0][0])
-
-    first_timestamp = min(first_timestamp_list)
-    for key in readings.keys():
-        for read in readings[key]:
-            read[0] = read[0] - first_timestamp
-
-    return Data(readings, spell, author, device)

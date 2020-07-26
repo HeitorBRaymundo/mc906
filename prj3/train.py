@@ -62,6 +62,8 @@ def grid_search(model, param_grid, X, y, n_jobs=6):
 
     display(HTML('<h5>Gráfico Matriz de Confusão: </h5>'))
 
+    pd.reset_option('display.max_colwidth', silent=True)
+
     plot_confusion_matrix_from_data(val_targets, val_predicts, np.unique(np.array(val_targets)))
 
     return model
