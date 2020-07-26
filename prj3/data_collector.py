@@ -8,7 +8,7 @@ import numpy as np
 
 AUTHOR = Author.HEITOR
 DEVICE = Device.MOTO_X
-SPELL = Spell.WINGARDIUM_LEVIOSA
+SPELL = Spell.REVELIO
 PORT = 5555
 
 print_local_ip()
