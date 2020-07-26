@@ -12,7 +12,9 @@ app = Flask(__name__)
 PORT = 5555
 
 def convert_data(content, spell, author, device):
-    readings = defaultdict(list)
+    readings = {
+        "ACC": [], "GYR": []
+    }
 
     for data_list in list(csv.reader(content.splitlines(), skipinitialspace=True)):
         read = [float(data_list[1])]
