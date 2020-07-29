@@ -3,6 +3,7 @@ import pickle
 from datetime import datetime
 from pathlib import Path
 import numpy as np
+from sklearn.utils import shuffle
 
 from enumerations import Author, Spell
 
@@ -71,13 +72,24 @@ class Data:
     def __str__(self):
         return self.__dict__
 
+    def to_dict(self):
+        return {
+            'spell': self.spell.value,
+            'author': self.author.value,
+            'device': self.device.value,
+            'date': self.date,
+            'acc_data': len(self.readings['ACC']),
+            'gyr_data': len(self.readings['GYR']),
+            'time': self.get_max_timestamp() - self.get_min_timestamp()
+        }
+
 
 class Database:
 
     def __init__(self, datalist):
-        self.datalist = datalist
-        self.datadict = [data.__dict__ for data in self.datalist]
-        self.X = np.array(datalist)
+        self.datalist = shuffle(datalist, random_state=0)
+        self.datadict = [data.to_dict() for data in self.datalist]
+        self.X = np.array(self.datalist)
         self.y = np.array([data.spell.value for data in self.datalist])
 
 def load_database():
