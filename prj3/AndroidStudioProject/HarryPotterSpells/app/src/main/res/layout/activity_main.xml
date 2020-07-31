@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <Button
+    <ImageButton
         android:id="@+id/btnSpell"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -16,11 +16,15 @@
         android:layout_marginEnd="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginBottom="10dp"
-        android:text="SPELL LAUNCHER"
+        android:padding="100dp"
+        android:src="@drawable/ic_noun_wand_2227147"
+        android:background="@drawable/drawable_button_back"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtPort" />
+        app:layout_constraintTop_toBottomOf="@+id/txtPort"
+        app:layout_constraintVertical_bias="1.0" />
 
     <EditText
         android:id="@+id/txtIp"

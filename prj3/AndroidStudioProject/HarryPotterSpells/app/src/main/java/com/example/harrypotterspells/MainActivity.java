@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -32,7 +33,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     private StringBuilder sensorData;
 
-    private Button btnSpell;
+    private ImageButton btnSpell;
     private EditText txtIp, txtPort;
 
     private boolean recording;
