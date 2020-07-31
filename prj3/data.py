@@ -3,8 +3,10 @@ import pickle
 from datetime import datetime
 from pathlib import Path
 import numpy as np
+from sklearn.preprocessing import OneHotEncoder, LabelEncoder
 from sklearn.utils import shuffle
 
+from cross_validation import cv_folds_author
 from enumerations import Author, Spell
 
 ROOT_FOLDER = 'data'
@@ -91,6 +93,20 @@ class Database:
         self.datadict = [data.to_dict() for data in self.datalist]
         self.X = np.array(self.datalist)
         self.y = np.array([data.spell.value for data in self.datalist])
+        self.cv_author = (list(cv_folds_author(self.X)))
+
+        self.label_encoder = LabelEncoder()
+        integer_encoded = self.label_encoder.fit_transform(self.y)
+        integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
+        self.ones_encoder = OneHotEncoder(sparse=False)
+        self.y_encoded = self.ones_encoder.fit_transform(integer_encoded)
+
+    def decode(self, onehot_encoded):
+        inverted_list = []
+        for onehot_encoded_data in onehot_encoded:
+            inverted_list.append(self.label_encoder.inverse_transform([np.argmax(onehot_encoded_data)]))
+        return np.array(inverted_list)
+
 
 def load_database():
     database = []
