@@ -7,7 +7,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -50,9 +53,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         gyroscopeSensor     = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
         btnSpell = findViewById(R.id.btnSpell);
-        txtIp = findViewById(R.id.txtIp);
-        txtPort = findViewById(R.id.txtPort);
-
 
         requestQueue = Volley.newRequestQueue(this);
 
@@ -62,8 +62,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 if (btnSpell.isEnabled()) {
 
                     if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                        vibrationFeedback();
                         startRecord();
                     } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                        vibrationFeedback();
                         sendRecord();
                     }
                 }
@@ -85,7 +87,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         btnSpell.setEnabled(false);
 
         try {
-            String URL = "http://"+txtIp.getText().toString()+":"+txtPort.getText().toString()+"/collect";
+
+            Bundle b = getIntent().getExtras();
+            String ip = "";
+            String port = "";
+
+            if(b != null) {
+                ip = b.getString("ip");
+                port =  b.getString("port");
+            }
+
+            String URL = "http://"+ip+":"+port+"/collect";
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("data", sensorData.toString());
 
@@ -153,6 +165,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             return true;
         }
         return false;
+    }
+
+    private void vibrationFeedback() {
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            v.vibrate(VibrationEffect.createOneShot(250, VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            v.vibrate(250);
+        }
     }
 
     @Override

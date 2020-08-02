@@ -27,7 +27,7 @@ public class SpashScreenActivity extends AppCompatActivity {
     }
 
     private void openMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
+        Intent intent = new Intent(this, SetupActivity.class);
         startActivity(intent);
         finish();
     }
