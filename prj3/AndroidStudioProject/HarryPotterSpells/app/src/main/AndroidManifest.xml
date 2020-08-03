@@ -10,6 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".SpellActivity"></activity>
         <activity
             android:name=".SpashScreenActivity"
             android:screenOrientation="portrait"
@@ -27,8 +28,8 @@
             android:name=".SetupActivity"
             android:screenOrientation="portrait" />
     </application>
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
 
 </manifest>

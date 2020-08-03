@@ -3,6 +3,7 @@ package com.example.harrypotterspells;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -105,6 +107,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     jsonBody, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
+                    try {
+                        openSpellDescriptionScreen(response.getString("results"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                     btnSpell.setEnabled(true);
                 }
             }, new Response.ErrorListener() {
@@ -120,6 +127,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         } catch (JSONException e) {
             toast(e.getMessage());
         }
+    }
+
+    private void openSpellDescriptionScreen(String spell) {
+        Intent intent = new Intent(MainActivity.this, SpellActivity.class);
+
+        Bundle b = new Bundle();
+        b.putString("spell", spell);
+        intent.putExtras(b);
+        startActivity(intent);
     }
 
     private String toStringArrayFloat(float[] data, int size){
