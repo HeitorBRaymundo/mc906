@@ -1,5 +1,4 @@
 import csv
-from collections import defaultdict
 
 from data import Data
 from enumerations import Author, Device, Spell
