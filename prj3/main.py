@@ -40,7 +40,7 @@ def convert_data(content, spell, author, device):
 def collect():
     AUTHOR = Author.TESTER
     DEVICE = Device.UNKNOWN
-    SPELL = Spell.WINGARDIUM_LEVIOSA
+    SPELL = Spell.ALOHOMORA
 
     content = request.json["data"]
 
