@@ -38,9 +38,9 @@ def convert_data(content, spell, author, device):
 
 @app.route('/collect', methods=['POST'])
 def collect():
-    AUTHOR = Author.DIEGO
-    DEVICE = Device.MOTO_G5S_PLUS
-    SPELL = Spell.ARRESTO_MOMENTUM
+    AUTHOR = Author.TESTER
+    DEVICE = Device.UNKNOWN
+    SPELL = Spell.WINGARDIUM_LEVIOSA
 
     content = request.json["data"]
 
