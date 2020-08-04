@@ -91,15 +91,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         try {
 
             Bundle b = getIntent().getExtras();
-            String ip = "";
-            String port = "";
+            String serverAddress = "";
 
             if(b != null) {
-                ip = b.getString("ip");
-                port =  b.getString("port");
+                serverAddress = b.getString("serverAddress");
             }
 
-            String URL = "http://"+ip+":"+port+"/collect";
+            String URL = serverAddress+"/collect";
             JSONObject jsonBody = new JSONObject();
             jsonBody.put("data", sensorData.toString());
 
