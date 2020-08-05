@@ -29,12 +29,20 @@ def grid_search(model, param_grid, X, y, cv, n_jobs=6):
     # Grafico Acuracia dos experimentos grid search
     display(HTML('<h3>Gráfico dos experimentos: </h3>'))
     fig, ax = plt.subplots(figsize=(10, 10))
-    ax.scatter(df.index, df['mean_train_score'], marker='o', color="blue")
-    ax.errorbar(df.index, df['mean_test_score'], yerr=df['std_test_score'], fmt='rD', ecolor="red", label="Test")
-    ax.set_xticks(df.index)
+
+    if isinstance(param_grid, dict) and len(param_grid.keys()) == 1:
+        key = list(param_grid.keys())[0]
+        index = [str(p) for p in param_grid[key]]
+        ax.set_xlabel('Valor de {}'.format(key))
+    else:
+        index = df.index
+        ax.set_xlabel('Número do experimento')
+
+    ax.scatter(index, df['mean_train_score'], marker='o', color="blue")
+    ax.errorbar(index, df['mean_test_score'], yerr=df['std_test_score'], fmt='rD', ecolor="red", label="Test")
+    ax.set_xticks(index)
 
     ax.legend(["Treino", "Validação"])
-    ax.set_xlabel('Número do experimento')
     ax.set_ylabel('Acurácia')
     plt.show()
 
