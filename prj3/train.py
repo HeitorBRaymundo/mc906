@@ -9,7 +9,7 @@ import numpy as np
 
 from confusion_matrix import plot_confusion_matrix_from_data
 
-def grid_search(model, param_grid, X, y, cv, n_jobs=6):
+def grid_search(model, param_grid, X, y, cv, n_jobs=6, figsize=(10, 10)):
     pd.set_option('display.max_colwidth', None)
     pd.set_option('display.max_rows', None)
 
@@ -28,7 +28,7 @@ def grid_search(model, param_grid, X, y, cv, n_jobs=6):
 
     # Grafico Acuracia dos experimentos grid search
     display(HTML('<h3>Gráfico dos experimentos: </h3>'))
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=figsize)
 
     if isinstance(param_grid, dict) and len(param_grid.keys()) == 1:
         key = list(param_grid.keys())[0]
