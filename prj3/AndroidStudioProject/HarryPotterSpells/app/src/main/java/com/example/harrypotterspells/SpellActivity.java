@@ -4,11 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 public class SpellActivity extends AppCompatActivity {

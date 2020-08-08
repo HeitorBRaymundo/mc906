@@ -40,7 +40,7 @@ def convert_data(content, spell, author, device):
 def collect():
     AUTHOR = Author.TESTER
     DEVICE = Device.UNKNOWN
-    SPELL = Spell.ALOHOMORA
+    SPELL = Spell.FINITE_INCANTATEM
 
     content = request.json["data"]
 
@@ -64,7 +64,7 @@ def collect():
 def predict():
     # TODO: colocar melhor modelo para previsão
     content = request.json["data"]
-    data = convert_data(content, Author.UNKNOWN, Device.UNKNOWN, Spell.UNKNOWN)
+    data = convert_data(content, Author.TESTER, Device.UNKNOWN, Spell.WINGARDIUM_LEVIOSA)
 
     if data is not None:
         # PREDICT
