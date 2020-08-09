@@ -1,26 +1,14 @@
-Etapas do projeto
+## Classificação de Movimento - Feitiços de Harry Potter
 
-Semana 1: prova de conceito com por exemplo dois feiticos
-- Usar metodo de interpolação para encontrar uma função de cada sensor
-- Pegar "x" pontos de cada sensor e utilizar no modelo
-- Pegar os coeficientes de cada função obtida para aplicar no modelo
-- Testar Logistic Regression
+Os arquivos do projetos estão organizados da seguinte forma:
 
-
-Semana 2: Testar diferentes modelos (variar parametros)
-
-- Logistic Regression
-- Knn
-- SVM
-- PCA, LDA
-- Redes Neurais
-
-Semana 3: Modelos mais avançados
-
-- Redes LSMT
-- Sistemas Fuzzy
-
-
+* **AndroidStudioProject**:projeto feito no android studio para captura dos dados.
+* **/data**: pasta que contem os arquivos que compunham o dataset
+* **/models**: melhores modelos salvos no notebook **05_Comparando melhores resultados**
+* **main.py**: função principal pra coleta de dados (basta coloar endereco printado no app)
+* **predict.py**: programa principal para previsão com o app, já possui melhor modelo (basta coloar endereco printado no app)
+* **spells_list.png**: lista de feitiços válidos.
+* **app.apk**: ultima versao do app android
 
 
 

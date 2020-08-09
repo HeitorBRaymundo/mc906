@@ -7,17 +7,17 @@ import numpy as np
 from data import Data
 from enumerations import Author, Device, Spell
 from main import convert_data
-from utils import print_local_ip
+from utils import print_address
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
 PORT = 5555
 
-with open('models/best_fully_connected.pkl', 'rb') as fid:
+with open('models/best_random_forest.pkl', 'rb') as fid:
     clf = pickle.load(fid)
 
-with open('models/best_fully_connected_acc.pkl', 'rb') as fid:
+with open('models/best_random_forest_acc.pkl', 'rb') as fid:
     clf_acc = pickle.load(fid)
 
 
@@ -58,5 +58,5 @@ def predict():
 
 
 if __name__ == '__main__':
-    print_local_ip()
+    print_address(PORT)
     app.run(host='0.0.0.0', port=PORT, debug=True)

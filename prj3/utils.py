@@ -25,10 +25,10 @@ def plot_image(*images, titles=[], table_format=(1, 0), figsize=(15, 15), axis=F
     plt.show()
 
 
-def print_local_ip():
+def print_address(port):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     s.connect(("8.8.8.8", 80))
-    print("HOST: {}".format(s.getsockname()[0]))
+    print("ADDRESS: http://{}:{}".format(s.getsockname()[0], port))
     s.close()
 
 def user_confirmation(message):

@@ -2,7 +2,7 @@ import csv
 
 from data import Data
 from enumerations import Author, Device, Spell
-from utils import print_local_ip
+from utils import print_address
 from flask import Flask, request, jsonify
 import numpy as np
 
@@ -60,20 +60,7 @@ def collect():
     return jsonify(success=True)
 
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    # TODO: colocar melhor modelo para previsão
-    content = request.json["data"]
-    data = convert_data(content, Author.TESTER, Device.UNKNOWN, Spell.WINGARDIUM_LEVIOSA)
-
-    if data is not None:
-        # PREDICT
-        pass
-
-    return jsonify(success=True)
-
-
 if __name__ == '__main__':
-    print_local_ip()
+    print_address(PORT)
     app.run(host='0.0.0.0', port=PORT, debug=True)
 
